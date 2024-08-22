@@ -13,7 +13,9 @@
         action
     )
 
-	(:constants INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean)
+	(:constants a_search_pipeline a_inspect_pipeline - action
+    INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean
+  )
 
     (:predicates
         (pipeline_found ?p - pipeline)

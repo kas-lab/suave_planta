@@ -1,19 +1,18 @@
 (define (problem example-auv)
   (:domain suave)
 
-  (:objects 
-    a_search_pipeline a_inspect_pipeline - action 
+  (:objects
     pipeline - pipeline 
-    bluerov - robot 
-    qa_search_efficiency_low 0.25_decimal qa_water_visibility_high 3.25_decimal qa_water_visibility_low 1.25_decimal <_string qa_search_efficiency_medium 0.5_decimal qa_motion_efficiency_degraded 0.75_decimal battery_level qa_inspect_efficiency_high 1.0_decimal qa_search_efficiency_high qa_motion_efficiency_normal qa_water_visibility_medium 2.25_decimal fd_spiral_high f_generate_search_path fd_follow_pipeline fd_spiral_medium fd_all_thrusters c_thruster_2 performance c_thruster_4 fd_spiral_low fd_recover_thrusters f_maintain_motion obs_water_visibility c_thruster_1 f_follow_pipeline c_thruster_3 c_thruster_5 c_thruster_6 safety energy - object 
+    bluerov - robot
+    qa_search_efficiency_low 0.25_decimal qa_water_visibility_high 3.25_decimal qa_water_visibility_low 1.25_decimal <_string qa_search_efficiency_medium 0.5_decimal qa_motion_efficiency_degraded 0.75_decimal battery_level qa_inspect_efficiency_high 1.0_decimal qa_search_efficiency_high qa_motion_efficiency_normal qa_water_visibility_medium 2.25_decimal fd_spiral_high f_generate_search_path fd_follow_pipeline fd_spiral_medium fd_all_thrusters c_thruster_2 performance c_thruster_4 fd_spiral_low fd_recover_thrusters f_maintain_motion obs_water_visibility c_thruster_1 f_follow_pipeline c_thruster_3 c_thruster_5 c_thruster_6 safety energy - object
 )
 
   (:init
     (c_status c_thruster_4 false_string)
-    
+
     (action_requires a_search_pipeline f_generate_search_path f_maintain_motion)
     (action_requires a_inspect_pipeline f_follow_pipeline f_maintain_motion)
-    
+
     (hasValue qa_search_efficiency_low 0.25_decimal)
     (hasValue qa_water_visibility_high 3.25_decimal)
     (hasValue qa_water_visibility_low 1.25_decimal)

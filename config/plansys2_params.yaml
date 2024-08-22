@@ -15,3 +15,6 @@ executor:
   ros__parameters:
     bt_builder_plugin: "SimpleBTBuilder"
     # bt_builder_plugin: "STNBTBuilder"
+domain_expert:
+  ros__parameters:
+    validate_using_planner_node: true

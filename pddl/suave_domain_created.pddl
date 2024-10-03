@@ -4,6 +4,7 @@
       :typing
       :adl
       :negative-preconditions
+      :disjunctive-preconditions
       :derived-predicates
     )
 
@@ -14,7 +15,7 @@
     )
 
 	(:constants a_search_pipeline a_inspect_pipeline - action
-    INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean
+    INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean fd_unground
   )
 
     (:predicates
@@ -25,6 +26,8 @@
 
         (action_requires ?a - action ?f1 ?f2)
         (fd_available ?fd)
+        (system_in_mode ?s ?m)
+        (inferred-f_activated ?f)
 
 		(inferred-Component ?x)
 		(Component ?x)
@@ -909,64 +912,119 @@
  		)
  	)
 
-
-
-    (:action start_robot
-      :parameters (?r - robot)
-      :precondition (and
-      )
-      :effect (and
-        (robot_started ?r)
+  (:derived (inferred-f_activated ?f)
+    (and
+      (Function ?f)
+      (exists (?fd)
+        (and
+          (FunctionDesign ?fd)
+          (system_in_mode ?f ?fd)
+          (not (= ?fd fd_unground))
+        )
       )
     )
+  )
 
-    (:action search_pipeline
-      :parameters (?a - action ?p - pipeline ?r - robot ?fd1 ?fd2)
-      :precondition (and
-        (= ?a a_search_pipeline)
-        (exists (?f1 ?f2)
+
+  (:action start_robot
+    :parameters (?r - robot)
+    :precondition (and
+    )
+    :effect (and
+      (robot_started ?r)
+    )
+  )
+
+
+  (:action reconfigure
+    :parameters (?f ?fd)
+    :precondition (and
+      (Function ?f)
+      (FunctionDesign ?fd)
+      (not (exists (?fd_initial)
           (and
-            (action_requires ?a ?f1 ?f2)
-            (Function ?f1)
-            (Function ?f2)
-            (FunctionDesign ?fd1)
-            (FunctionDesign ?fd2)
-            (solvesF ?fd1 ?f1)
-            (solvesF ?fd2 ?f2)
-            (not (inferred-Fd_realisability ?fd1 false_boolean))
-            (not (inferred-Fd_realisability ?fd2 false_boolean))
+            (FunctionDesign ?fd_initial)
+            (system_in_mode ?f ?fd_initial)
           )
         )
-        (robot_started ?r)
-      )
-      :effect (and
-        (pipeline_found ?p)
       )
     )
+    :effect (and
+      (system_in_mode ?f ?fd)
+    )
+  )
 
-    (:action inspect_pipeline
-      :parameters (?a - action ?p - pipeline ?r - robot ?fd1 ?fd2)
-      :precondition (and
-        (= ?a a_inspect_pipeline)
-        (exists (?f1 ?f2)
-          (and
-            (action_requires ?a ?f1 ?f2)
-            (Function ?f1)
-            (Function ?f2)
-            (FunctionDesign ?fd1)
-            (FunctionDesign ?fd2)
-            (solvesF ?fd1 ?f1)
-            (solvesF ?fd2 ?f2)
-            (not (inferred-Fd_realisability ?fd1 false_boolean))
-            (not (inferred-Fd_realisability ?fd2 false_boolean))
-          )
+  (:action reconfigure
+    :parameters (?f ?fd)
+    :precondition (and
+      (Function ?f)
+      (FunctionDesign ?fd)
+      (exists (?fd_initial)
+        (and
+          (FunctionDesign ?fd_initial)
+          (system_in_mode ?f ?fd_initial)
+          (not (= ?fd ?fd_initial))
         )
-
-        (robot_started ?r)
-        (pipeline_found ?p)
-      )
-      :effect (and
-        (pipeline_inspected ?p)
       )
     )
+    :effect (and
+      (system_in_mode ?f ?fd)
+      (not (system_in_mode ?f ?fd_initial))
+    )
+  )
+
+  (:action search_pipeline
+    :parameters (?a - action ?p - pipeline ?r - robot ?fd1 ?fd2)
+    :precondition (and
+      (= ?a a_search_pipeline)
+      (exists (?f1 ?f2)
+        (and
+          (action_requires ?a ?f1 ?f2)
+          (Function ?f1)
+          (Function ?f2)
+          (FunctionDesign ?fd1)
+          (FunctionDesign ?fd2)
+          (solvesF ?fd1 ?f1)
+          (solvesF ?fd2 ?f2)
+          (not (inferred-Fd_realisability ?fd1 false_boolean))
+          (not (inferred-Fd_realisability ?fd2 false_boolean))
+          (system_in_mode ?f1 ?fd1)
+          (system_in_mode ?f2 ?fd2)
+        )
+      )
+      (not (inferred-f_activated f_follow_pipeline))
+      (robot_started ?r)
+    )
+    :effect (and
+      (pipeline_found ?p)
+    )
+  )
+
+  (:action inspect_pipeline
+    :parameters (?a - action ?p - pipeline ?r - robot ?fd1 ?fd2)
+    :precondition (and
+      (= ?a a_inspect_pipeline)
+      (exists (?f1 ?f2)
+        (and
+          (action_requires ?a ?f1 ?f2)
+          (Function ?f1)
+          (Function ?f2)
+          (FunctionDesign ?fd1)
+          (FunctionDesign ?fd2)
+          (solvesF ?fd1 ?f1)
+          (solvesF ?fd2 ?f2)
+          (not (inferred-Fd_realisability ?fd1 false_boolean))
+          (not (inferred-Fd_realisability ?fd2 false_boolean))
+          (system_in_mode ?f1 ?fd1)
+          (system_in_mode ?f2 ?fd2)
+        )
+      )
+      (not (inferred-f_activated f_generate_search_path))
+      (robot_started ?r)
+      (pipeline_found ?p)
+    )
+    :effect (and
+      (pipeline_inspected ?p)
+    )
+  )
 )

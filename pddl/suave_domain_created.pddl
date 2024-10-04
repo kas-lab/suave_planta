@@ -6,6 +6,7 @@
       :negative-preconditions
       :disjunctive-preconditions
       :derived-predicates
+      :existential-preconditions
     )
 
     (:types
@@ -15,7 +16,7 @@
     )
 
 	(:constants a_search_pipeline a_inspect_pipeline - action
-    INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean fd_unground
+    INTERNAL_ERROR_string IN_ERROR_FR_string IN_ERROR_COMPONENT_string IN_ERROR_NFR_string FALSE_string false_boolean water_visibility RECOVERED_string true_boolean fd_unground f_follow_pipeline f_generate_search_path f_maintain_motion
   )
 
     (:predicates
@@ -935,41 +936,18 @@
     )
   )
 
-
   (:action reconfigure
-    :parameters (?f ?fd)
+    :parameters (?f ?fd_initial ?fd_goal)
     :precondition (and
       (Function ?f)
-      (FunctionDesign ?fd)
-      (not (exists (?fd_initial)
-          (and
-            (FunctionDesign ?fd_initial)
-            (system_in_mode ?f ?fd_initial)
-          )
-        )
-      )
+      (FunctionDesign ?fd_initial)
+      (FunctionDesign ?fd_goal)
+      (system_in_mode ?f ?fd_initial)
+      (not (= ?fd_initial ?fd_goal))
     )
     :effect (and
-      (system_in_mode ?f ?fd)
-    )
-  )
-
-  (:action reconfigure
-    :parameters (?f ?fd)
-    :precondition (and
-      (Function ?f)
-      (FunctionDesign ?fd)
-      (exists (?fd_initial)
-        (and
-          (FunctionDesign ?fd_initial)
-          (system_in_mode ?f ?fd_initial)
-          (not (= ?fd ?fd_initial))
-        )
-      )
-    )
-    :effect (and
-      (system_in_mode ?f ?fd)
       (not (system_in_mode ?f ?fd_initial))
+      (system_in_mode ?f ?fd_goal)
     )
   )
 

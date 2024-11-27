@@ -90,6 +90,18 @@
 		(inferred-LessThan ?x ?y)
     )
 
+  (:derived (inferred-f_activated ?f)
+    (and
+      (Function ?f)
+      (exists (?fd)
+        (and
+          (FunctionDesign ?fd)
+          (system_in_mode ?f ?fd)
+          (not (= ?fd fd_unground))
+        )
+      )
+    )
+  )
 
 	(:derived (inferred-Component ?x)
 		(and
@@ -912,20 +924,6 @@
 			)
  		)
  	)
-
-  (:derived (inferred-f_activated ?f)
-    (and
-      (Function ?f)
-      (exists (?fd)
-        (and
-          (FunctionDesign ?fd)
-          (system_in_mode ?f ?fd)
-          (not (= ?fd fd_unground))
-        )
-      )
-    )
-  )
-
 
   (:action start_robot
     :parameters (?r - robot)

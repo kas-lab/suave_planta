@@ -86,28 +86,34 @@ def generate_launch_description():
     suave_planning_controller_node = Node(
         package='suave_planning',
         executable='suave_plansys_controller',
-        # parameters=[mission_config]
     )
 
     start_robot_pddl_action_node = Node(
         package='suave_planning',
         executable='action_start_robot',
-        # parameters=[mission_config]
+        name='start_robot_pddl_action_node',
         parameters=[{'action_name': 'start_robot'}]
     )
 
     search_pipeline_pddl_action_node = Node(
         package='suave_planning',
         executable='action_search_pipeline',
-        # parameters=[mission_config]
+        name='search_pipeline_pddl_action_node',
         parameters=[{'action_name': 'search_pipeline'}]
     )
 
     inspect_pipeline_pddl_action_node = Node(
         package='suave_planning',
         executable='action_inspect_pipeline',
-        # parameters=[mission_config]
+        name='inspect_pipeline_pddl_action_node',
         parameters=[{'action_name': 'inspect_pipeline'}]
+    )
+
+    reconfigure_pddl_action_node = Node(
+        package='suave_planning',
+        executable='action_reconfigure',
+        name='reconfigure_pddl_action_node',
+        parameters=[{'action_name': 'reconfigure'}]
     )
 
     return LaunchDescription([
@@ -119,4 +125,5 @@ def generate_launch_description():
         start_robot_pddl_action_node,
         search_pipeline_pddl_action_node,
         inspect_pipeline_pddl_action_node,
+        reconfigure_pddl_action_node,
     ])

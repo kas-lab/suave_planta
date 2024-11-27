@@ -12,6 +12,10 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(plansys2_executor REQUIRED)
+find_package(plansys2_domain_expert REQUIRED)
+find_package(plansys2_problem_expert REQUIRED)
+find_package(plansys2_planner REQUIRED)
+find_package(system_modes_msgs REQUIRED)
 
 set(dependencies
   ament_cmake
@@ -20,6 +24,10 @@ set(dependencies
   std_srvs
   rclcpp
   plansys2_executor
+  plansys2_domain_expert
+  plansys2_problem_expert
+  plansys2_planner
+  system_modes_msgs
 )
 
 include_directories(
@@ -38,6 +46,9 @@ ament_target_dependencies(action_start_robot ${dependencies})
 add_executable(action_recharge src/action_recharge.cpp)
 ament_target_dependencies(action_recharge ${dependencies})
 
+add_executable(action_reconfigure src/action_reconfigure.cpp)
+ament_target_dependencies(action_reconfigure ${dependencies})
+
 add_executable(suave_plansys_controller src/suave_plansys_controller.cpp)
 ament_target_dependencies(suave_plansys_controller ${dependencies})
 
@@ -47,6 +58,7 @@ install(TARGETS
   action_inspect_pipeline
   action_start_robot
   action_recharge
+  action_reconfigure
   suave_plansys_controller
   DESTINATION lib/${PROJECT_NAME}
 )

@@ -36,6 +36,8 @@ public:
 
   virtual ~SuavePlansysController();
 
+  void init();
+
 protected:
   rclcpp::CallbackGroup::SharedPtr step_timer_cb_group_;
   rclcpp::TimerBase::SharedPtr step_timer_;

@@ -26,21 +26,21 @@ namespace suave_plansys
 {
 
   SuavePlansysController::SuavePlansysController(const std::string & node_name)
-  : rclcpp::Node(node_name)
+  : Node(node_name), _time_limit(300)
 {
+
+}
+
+void SuavePlansysController::init(){
   domain_expert_ = std::make_shared<plansys2::DomainExpertClient>();
   planner_client_ = std::make_shared<plansys2::PlannerClient>();
   problem_expert_ = std::make_shared<plansys2::ProblemExpertClient>();
-  executor_client_ = std::make_shared<plansys2::ExecutorClient>("rosa_plansys_controller_executor");
+  executor_client_ = std::make_shared<plansys2::ExecutorClient>("suave_plansys_controller_executor");
 
-  step_timer_cb_group_ = create_callback_group(
+  step_timer_cb_group_ = this->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
-  // TODO: create parameter for timer rate?
   step_timer_ = this->create_wall_timer(
     1s, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
-
-  this->declare_parameter("time_limit", 300);
-  _time_limit = this->get_parameter("time_limit").as_int();
 
   save_mission_results_cli =
     this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
@@ -50,11 +50,12 @@ namespace suave_plansys
     10,
     std::bind(&SuavePlansysController::search_pipeline_transition_cb_, this, _1));
 
-  time_limit_timer_cb_group_ = create_callback_group(
+  time_limit_timer_cb_group_ = this->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
-  // TODO: create parameter for timer rate?
   time_limit_timer_ = this->create_wall_timer(
     100ms, std::bind(&SuavePlansysController::time_limit_cb, this), time_limit_timer_cb_group_);
+
+  this->declare_parameter("time_limit", 300);
 }
 
 SuavePlansysController::~SuavePlansysController()
@@ -84,33 +85,33 @@ void SuavePlansysController::execute_plan(){
 
   std::cout << "Selected plan: " << std::endl;
   for (auto item : plan->items){
-    RCLCPP_INFO(this->get_logger(), "  Action: '%s'", item.action.c_str());
+    RCLCPP_INFO(get_logger(), "  Action: '%s'", item.action.c_str());
   }
   // Execute the plan
   executor_client_->start_plan_execution(plan.value());
 }
 
 void SuavePlansysController::finish_controlling(){
-  this->step_timer_->cancel();
-  this->executor_client_->cancel_plan_execution();
-  this->request_save_mission_results();
-  this->time_limit_timer_->cancel();
+  step_timer_->cancel();
+  executor_client_->cancel_plan_execution();
+  request_save_mission_results();
+  time_limit_timer_->cancel();
 }
 
 void SuavePlansysController::step(){
   if (first_iteration_){
-    this->execute_plan();
+    execute_plan();
     first_iteration_ = false;
     return;
   }
 
   if (!executor_client_->execute_and_check_plan() && executor_client_->getResult()) {
     if (executor_client_->getResult().value().success) {
-      RCLCPP_INFO(this->get_logger(), "Plan execution finished with success!");
-      this->finish_controlling();
+      RCLCPP_INFO(get_logger(), "Plan execution finished with success!");
+      finish_controlling();
     } else {
-        RCLCPP_INFO(this->get_logger(), "Replanning!");
-        this->execute_plan();
+        RCLCPP_INFO(get_logger(), "Replanning!");
+        execute_plan();
         return;
     }
   }
@@ -119,41 +120,42 @@ void SuavePlansysController::step(){
   for (const auto & action_feedback : feedback.action_execution_status) {
     if (action_feedback.status == plansys2_msgs::msg::ActionExecutionInfo::FAILED) {
       std::string error_str_ = "[" + action_feedback.action + "] finished with error: " + action_feedback.message_status;
-      RCLCPP_ERROR(this->get_logger(), error_str_.c_str());
+      RCLCPP_ERROR(get_logger(), error_str_.c_str());
       break;
     }
 
-    std::string arguments_str_ = " ";
-    for (const auto & arguments: action_feedback.arguments){
-      arguments_str_ += arguments + " ";
-    }
-    std::string feedback_str_ = "[" + action_feedback.action + arguments_str_ +
-      std::to_string(action_feedback.completion * 100.0) + "%]";
-    RCLCPP_INFO(this->get_logger(), feedback_str_.c_str());
+    // std::string arguments_str_ = " ";
+    // for (const auto & arguments: action_feedback.arguments){
+    //   arguments_str_ += arguments + " ";
+    // }
+    // std::string feedback_str_ = "[" + action_feedback.action + arguments_str_ +
+    //   std::to_string(action_feedback.completion * 100.0) + "%]";
+    // RCLCPP_INFO(get_logger(), feedback_str_.c_str());
   }
 }
 
 void SuavePlansysController::time_limit_cb(){
-    if(_search_started && (this->get_clock()->now() - _start_time) >= rclcpp::Duration(_time_limit, 0)){
-      RCLCPP_INFO(this->get_logger(), "Time limit reached!");
-      this->finish_controlling();
+    _time_limit = get_parameter("time_limit").as_int();
+    if(_search_started && (get_clock()->now() - _start_time) >= rclcpp::Duration(_time_limit, 0)){
+      RCLCPP_INFO(get_logger(), "Time limit reached!");
+      finish_controlling();
     }
 }
 
 bool SuavePlansysController::request_save_mission_results(){
   while (!save_mission_results_cli->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
-      RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+      RCLCPP_ERROR(get_logger(), "Interrupted while waiting for the service. Exiting.");
       return false;
     }
-    RCLCPP_INFO(this->get_logger(), "mission_metrics/save service not available, waiting again...");
+    RCLCPP_INFO(get_logger(), "mission_metrics/save service not available, waiting again...");
   }
 
   auto request = std::make_shared<std_srvs::srv::Empty::Request>();
   auto response = save_mission_results_cli->async_send_request(request);
   if (response.wait_for(1s) != std::future_status::ready)
   {
-    RCLCPP_ERROR(this->get_logger(), "Failed to call service mission_metrics/save");
+    RCLCPP_ERROR(get_logger(), "Failed to call service mission_metrics/save");
     return false;
   }
   return true;
@@ -161,7 +163,7 @@ bool SuavePlansysController::request_save_mission_results(){
 
 void SuavePlansysController::search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg){
   if(msg.goal_state.id == 3){
-    _start_time = this->get_clock()->now();
+    _start_time = get_clock()->now();
     _search_started = true;
   }
 }
@@ -174,10 +176,15 @@ int main(int argc, char ** argv)
   auto node = std::make_shared<suave_plansys::SuavePlansysController>(
     "suave_plansys_controller");
 
+  node->init();
+
   rclcpp::Rate rate(5);
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node->get_node_base_interface());
+  executor.add_node(node);
+  // executor.add_node(std::make_shared<suave_plansys::SuavePlansysController>(
+  //   "suave_plansys_controller"));
   executor.spin();
-
+  executor.remove_node(node);
   rclcpp::shutdown();
+  return 0;
 }

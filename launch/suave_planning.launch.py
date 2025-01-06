@@ -23,6 +23,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+from launch.actions import ExecuteProcess
+from launch.actions import RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+
 
 def generate_launch_description():
     # stdout_linebuf_envvar = SetEnvironmentVariable(
@@ -67,6 +71,68 @@ def generate_launch_description():
     )
 
     suave_planning_path = get_package_share_directory('suave_planning')
+    suave_ontology_path = os.path.join(
+        suave_planning_path,
+        'owl',
+        'suave.owl'
+    )
+    suave_pddl_path = os.path.join(
+        suave_planning_path,
+        'pddl'
+    )
+    suave_domain_path = os.path.join(
+        suave_pddl_path,
+        'suave_domain.pddl'
+    )
+    suave_domain_out_path = os.path.join(
+        suave_pddl_path,
+        'suave_domain_created.pddl'
+    )
+    suave_problem_path = os.path.join(
+        suave_pddl_path,
+        'suave_problem.pddl'
+    )
+    suave_problem_out_path = os.path.join(
+        suave_pddl_path,
+        'suave_problem_created.pddl'
+    )
+
+    owl_to_pddl_path = get_package_share_directory('owl_to_pddl')
+    owl_to_pdd_jar = os.path.join(
+        owl_to_pddl_path,
+        'build/libs/dlToPlanning-1.0-SNAPSHOT-all.jar'
+    )
+    owl_to_pddl = ExecuteProcess(
+        cmd=[
+            'java',
+            '-jar',
+            owl_to_pdd_jar,
+            '--owl=' + suave_ontology_path,
+            '--tBox',
+            '--inDomain=' + suave_domain_path,
+            '--outDomain=' + suave_domain_out_path,
+            '--aBox',
+            '--inProblem=' + suave_problem_path,
+            '--outProblem=' + suave_problem_out_path,
+            '--add-num-comparisons',
+            '--replace-output'
+        ])
+    # owl_to_pddl = Node(
+    #     package='owl_to_pddl',
+    #     executable='owl_to_pddl.py',
+    #     arguments=[
+    #         '--owl=' + suave_ontology_path,
+    #         '--tBox',
+    #         '--inDomain=' + suave_domain_path,
+    #         '--outDomain=' + suave_domain_out_path,
+    #         '--aBox',
+    #         '--inProblem=' + suave_problem_path,
+    #         '--outProblem=' + suave_problem_out_path,
+    #         '--add-num-comparisons',
+    #         '--replace-output'
+    #     ]
+    # )
+
     plansys_path = get_package_share_directory('plansys2_bringup')
     plansys2_bringup = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(
@@ -75,9 +141,9 @@ def generate_launch_description():
                 'plansys2_bringup_launch_distributed.py')),
             launch_arguments={
                 'model_file':
-                    suave_planning_path + '/pddl/suave_domain_created.pddl',
+                    suave_domain_out_path,
                 'problem_file':
-                    suave_planning_path + '/pddl/suave_problem_created.pddl',
+                    suave_problem_out_path,
                 'params_file':
                     suave_planning_path + '/config/plansys2_params.yaml',
             }.items()
@@ -120,7 +186,13 @@ def generate_launch_description():
         mission_type_arg,
         result_filename_arg,
         suave_planning_base,
-        plansys2_bringup,
+        owl_to_pddl,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=owl_to_pddl,
+                on_exit=[plansys2_bringup],
+            )
+        ),
         suave_planning_controller_node,
         start_robot_pddl_action_node,
         search_pipeline_pddl_action_node,

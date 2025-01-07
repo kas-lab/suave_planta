@@ -23,7 +23,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-from launch.actions import ExecuteProcess
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 
@@ -97,41 +96,20 @@ def generate_launch_description():
         'suave_problem_created.pddl'
     )
 
-    owl_to_pddl_path = get_package_share_directory('owl_to_pddl')
-    owl_to_pdd_jar = os.path.join(
-        owl_to_pddl_path,
-        'build/libs/dlToPlanning-1.0-SNAPSHOT-all.jar'
+    owl_to_pddl = Node(
+        package='owl_to_pddl',
+        executable='owl_to_pddl.py',
+        parameters=[{
+            'owl_file': suave_ontology_path,
+            'in_domain_file': suave_domain_path,
+            'out_domain_file': suave_domain_out_path,
+            'in_problem_file': suave_problem_path,
+            'out_problem_file': suave_problem_out_path,
+            'add_numbers': True,
+            'replace_output': True,
+            'ignore_data_properties': False
+        }]
     )
-    owl_to_pddl = ExecuteProcess(
-        cmd=[
-            'java',
-            '-jar',
-            owl_to_pdd_jar,
-            '--owl=' + suave_ontology_path,
-            '--tBox',
-            '--inDomain=' + suave_domain_path,
-            '--outDomain=' + suave_domain_out_path,
-            '--aBox',
-            '--inProblem=' + suave_problem_path,
-            '--outProblem=' + suave_problem_out_path,
-            '--add-num-comparisons',
-            '--replace-output'
-        ])
-    # owl_to_pddl = Node(
-    #     package='owl_to_pddl',
-    #     executable='owl_to_pddl.py',
-    #     arguments=[
-    #         '--owl=' + suave_ontology_path,
-    #         '--tBox',
-    #         '--inDomain=' + suave_domain_path,
-    #         '--outDomain=' + suave_domain_out_path,
-    #         '--aBox',
-    #         '--inProblem=' + suave_problem_path,
-    #         '--outProblem=' + suave_problem_out_path,
-    #         '--add-num-comparisons',
-    #         '--replace-output'
-    #     ]
-    # )
 
     plansys_path = get_package_share_directory('plansys2_bringup')
     plansys2_bringup = IncludeLaunchDescription(

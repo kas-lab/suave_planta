@@ -12,7 +12,6 @@
   (:types
     pipeline
     robot
-    owl-number
   )
 
   (:predicates
@@ -50,7 +49,7 @@
             (and
               (inferred-SolvesF ?fd ?f)
               (not (inferred-Fd_realisability ?fd false_boolean))
-              (inferred-Fd_better_utility  ?fd ?fd_goal)
+              (inferred-FdBetterUtility  ?fd ?fd_goal)
             )
           )
         )
@@ -84,7 +83,7 @@
             (and
               (inferred-SolvesF ?fd ?f)
               (not (inferred-Fd_realisability ?fd false_boolean))
-              (inferred-Fd_better_utility  ?fd ?fd_goal)
+              (inferred-FdBetterUtility  ?fd ?fd_goal)
             )
           )
         )

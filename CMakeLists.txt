@@ -7,6 +7,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
@@ -19,6 +20,7 @@ find_package(system_modes_msgs REQUIRED)
 
 set(dependencies
   ament_cmake
+  diagnostic_msgs
   mavros_msgs
   std_msgs
   std_srvs

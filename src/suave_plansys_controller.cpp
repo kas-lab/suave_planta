@@ -56,6 +56,75 @@ void SuavePlansysController::init(){
     100ms, std::bind(&SuavePlansysController::time_limit_cb, this), time_limit_timer_cb_group_);
 
   this->declare_parameter("time_limit", 300);
+
+  diagnostics_sub_  = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+    "/diagnostics",
+    10,
+    std::bind(&SuavePlansysController::diagnostics_cb, this, _1));
+}
+
+void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg){
+  for(const auto& status: msg.status){
+    if(status.message == "Component status") {
+      for(const auto& value: status.values){
+        if (value.value == "OK") {
+          auto rm_predicate_str = "(c_status " + value.key + " error_string)";
+          auto rm_predicate = parser::pddl::fromStringPredicate(rm_predicate_str);
+          if(problem_expert_->existPredicate(rm_predicate)) {
+            problem_expert_->removePredicate(rm_predicate);
+          }
+        } else if (value.value == "ERROR") {
+          auto add_predicate_str = "(c_status " + value.key + " error_string)";
+          problem_expert_->addPredicate(parser::pddl::fromStringPredicate(add_predicate_str));
+        }
+      }
+    }
+
+    if(status.message == "QA status") {
+      for(const auto& value : status.values){
+        auto predicates = problem_expert_->getPredicates();
+        for (const auto& predicate : predicates) {
+          if (predicate.name == "qa_has_value" && predicate.parameters[0].name =="obs_" + value.key){
+            problem_expert_->removePredicate(predicate);
+          }
+        }
+
+        add_symbolic_number(value.value);
+        auto add_predicate_str = "(qa_has_value obs_" + value.key + " " + value.value + "_decimal)";
+        problem_expert_->addPredicate(parser::pddl::fromStringPredicate(add_predicate_str));
+      }
+    }
+  }
+}
+
+void SuavePlansysController::add_symbolic_number(std::string number_str)
+{
+  float number_float = std::stof(number_str);
+  std::string number_decimal = number_str + "_decimal";
+
+  problem_expert_->addInstance(parser::pddl::fromStringParam(
+    number_decimal, "numerical-object"));
+
+  problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+    "(equalTo " + number_decimal + " " + number_decimal + ")"));
+
+  auto instances = problem_expert_->getInstances();
+
+  for (const auto& instance: instances) {
+    if (instance.type != "numerical-object") {
+      continue;
+    }
+
+    float number_float_2 = std::stof(instance.name.substr(0, instance.name.find("_")));
+
+    if (number_float < number_float_2) {
+      problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+        "(lessThan " + number_decimal + " " + instance.name + ")"));
+    } else if (number_float_2 < number_float) {
+      problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+        "(lessThan " + instance.name + " " + number_decimal + ")"));
+    }
+  }
 }
 
 SuavePlansysController::~SuavePlansysController()

@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "rclcpp/rclcpp.hpp"
+#include "diagnostic_msgs/msg/diagnostic_array.hpp"
 #include "std_msgs/msg/string.hpp"
 
 #include "plansys2_domain_expert/DomainExpertClient.hpp"
@@ -56,6 +57,10 @@ protected:
   rclcpp::Client<std_srvs::srv::Empty>::SharedPtr save_mission_results_cli;
 
   rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>::SharedPtr search_pipeline_transition_sub_;
+  rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagnostics_sub_;
+
+  void diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg);
+  void add_symbolic_number(std::string number);
 
   rclcpp::CallbackGroup::SharedPtr time_limit_timer_cb_group_;
   rclcpp::TimerBase::SharedPtr time_limit_timer_;

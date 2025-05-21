@@ -18,27 +18,31 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-from launch.conditions import LaunchConfigurationEquals
-from launch.conditions import LaunchConfigurationNotEquals
+from launch.actions import OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    mission_type = LaunchConfiguration('mission_type')
+    silent = LaunchConfiguration('silent')
+    silent_arg = DeclareLaunchArgument(
+        'silent',
+        default_value='false',
+        description='Suppress all output (launch logs + node logs)'
+    )
+    def configure_logging(context, *args, **kwargs):
+        if silent.perform(context) == 'true':
+            import logging
+            logging.getLogger().setLevel(logging.CRITICAL)
+        return []
+
     result_filename = LaunchConfiguration('result_filename')
     mission_config = LaunchConfiguration('mission_config')
 
-    mission_type_arg = DeclareLaunchArgument(
-        'mission_type',
-        default_value='time_constrained_mission',
-        description='Mission name for logging'
-    )
-
     result_filename_arg = DeclareLaunchArgument(
         'result_filename',
-        default_value='',
+        default_value='suave_planta_results',
         description='Name of the results file'
     )
 
@@ -72,29 +76,17 @@ def generate_launch_description():
         executable='mission_metrics',
         name='mission_metrics',
         parameters=[mission_config, {
-            'adaptation_manager': 'suave_planning',
-            'mission_name': mission_type,
-        }],
-        condition=LaunchConfigurationEquals('result_filename', '')
-    )
-
-    mission_metrics_node_override = Node(
-        package='suave_metrics',
-        executable='mission_metrics',
-        name='mission_metrics',
-        parameters=[mission_config, {
-            'adaptation_manager': 'suave_planning',
-            'mission_name': mission_type,
+            'adaptation_manager': 'suave_planta',
+            'mission_name': 'suave',
             'result_filename': result_filename,
         }],
-        condition=LaunchConfigurationNotEquals('result_filename', '')
     )
 
     return LaunchDescription([
-        mission_type_arg,
         result_filename_arg,
         mission_config_arg,
+        silent_arg,
+        OpaqueFunction(function=configure_logging),
         suave_launch,
         mission_metrics_node,
-        mission_metrics_node_override
     ])

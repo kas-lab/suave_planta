@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-# from launch.actions import SetEnvironmentVariable
+from launch.actions import OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -28,18 +28,19 @@ from launch.event_handlers import OnProcessExit
 
 
 def generate_launch_description():
-    # stdout_linebuf_envvar = SetEnvironmentVariable(
-    #     'RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1')
-
-    mission_type = LaunchConfiguration('mission_type')
-    result_filename = LaunchConfiguration('result_filename')
-
-    mission_type_arg = DeclareLaunchArgument(
-        'mission_type',
-        default_value='time_constrained_mission',
-        description='Desired mission type' +
-                    '[time_constrained_mission or const_dist_mission]'
+    silent = LaunchConfiguration('silent')
+    silent_arg = DeclareLaunchArgument(
+        'silent',
+        default_value='false',
+        description='Suppress all output (launch logs + node logs)'
     )
+    def configure_logging(context, *args, **kwargs):
+        if silent.perform(context) == 'true':
+            import logging
+            logging.getLogger().setLevel(logging.CRITICAL)
+        return []
+
+    result_filename = LaunchConfiguration('result_filename')
 
     result_filename_arg = DeclareLaunchArgument(
         'result_filename',
@@ -47,10 +48,10 @@ def generate_launch_description():
         description='Name of the results file'
     )
 
-    pkg_suave_planning = get_package_share_directory(
-        'suave_planning')
-    suave_planning_base_launch_path = os.path.join(
-        pkg_suave_planning,
+    pkg_suave_planta = get_package_share_directory(
+        'suave_planta')
+    suave_planta_base_launch_path = os.path.join(
+        pkg_suave_planta,
         'launch',
         'suave_base.launch.py')
 
@@ -60,23 +61,22 @@ def generate_launch_description():
         'mission_config.yaml'
     )
 
-    suave_planning_base = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(suave_planning_base_launch_path),
+    suave_planta_base = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(suave_planta_base_launch_path),
         launch_arguments={
-            'mission_type': mission_type,
             'result_filename': result_filename,
             'mission_config': mission_config,
         }.items()
     )
 
-    suave_planning_path = get_package_share_directory('suave_planning')
+    suave_planta_path = get_package_share_directory('suave_planta')
     suave_ontology_path = os.path.join(
-        suave_planning_path,
+        suave_planta_path,
         'owl',
         'suave.owl'
     )
     suave_pddl_path = os.path.join(
-        suave_planning_path,
+        suave_planta_path,
         'pddl'
     )
     suave_domain_path = os.path.join(
@@ -123,47 +123,48 @@ def generate_launch_description():
                 'problem_file':
                     suave_problem_out_path,
                 'params_file':
-                    suave_planning_path + '/config/plansys2_params.yaml',
+                    suave_planta_path + '/config/plansys2_params.yaml',
             }.items()
         )
 
-    suave_planning_controller_node = Node(
-        package='suave_planning',
-        executable='suave_plansys_controller',
+    suave_planta_controller_node = Node(
+        package='suave_planta',
+        executable='suave_planta_controller',
     )
 
     start_robot_pddl_action_node = Node(
-        package='suave_planning',
+        package='suave_planta',
         executable='action_start_robot',
         name='start_robot_pddl_action_node',
         parameters=[{'action_name': 'start_robot'}]
     )
 
     search_pipeline_pddl_action_node = Node(
-        package='suave_planning',
+        package='suave_planta',
         executable='action_search_pipeline',
         name='search_pipeline_pddl_action_node',
         parameters=[{'action_name': 'search_pipeline'}]
     )
 
     inspect_pipeline_pddl_action_node = Node(
-        package='suave_planning',
+        package='suave_planta',
         executable='action_inspect_pipeline',
         name='inspect_pipeline_pddl_action_node',
         parameters=[{'action_name': 'inspect_pipeline'}]
     )
 
     reconfigure_pddl_action_node = Node(
-        package='suave_planning',
+        package='suave_planta',
         executable='action_reconfigure',
         name='reconfigure_pddl_action_node',
         parameters=[{'action_name': 'reconfigure'}]
     )
 
     return LaunchDescription([
-        mission_type_arg,
         result_filename_arg,
-        suave_planning_base,
+        silent_arg,
+        OpaqueFunction(function=configure_logging),
+        suave_planta_base,
         owl_to_pddl,
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -171,7 +172,7 @@ def generate_launch_description():
                 on_exit=[plansys2_bringup],
             )
         ),
-        suave_planning_controller_node,
+        suave_planta_controller_node,
         start_robot_pddl_action_node,
         search_pipeline_pddl_action_node,
         inspect_pipeline_pddl_action_node,

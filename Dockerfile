@@ -1,5 +1,11 @@
 FROM ghcr.io/kas-lab/suave_rosa-headless:latest
 
+RUN sudo apt update && sudo apt install -y \
+    openjdk-17-jdk \
+    && sudo rm -rf /var/lib/apt/list/
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
 COPY --chown=ubuntu-user:ubuntu-user . $HOME/suave_ws/src/suave_planta/
 
 WORKDIR $HOME/suave_ws

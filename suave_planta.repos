@@ -1,0 +1,13 @@
+repositories:
+  plansys2:
+    type: git
+    url: https://github.com/Rezenders/ros2_planning_system.git
+    version: b29a4b16b63259e61da98dc294a15e6390f1690f  
+  dlToPlanning:
+    type: git
+    url: https://github.com/remaro-network/dlToPlanning.git
+    version: main
+  downward_ros:
+    type: git
+    url: https://github.com/kas-lab/downward_ros.git
+    version: main 

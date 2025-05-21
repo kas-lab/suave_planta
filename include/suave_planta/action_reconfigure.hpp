@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef SUAVE_PLANSYS__RECONFIGURE_HPP_
-#define SUAVE_PLANSYS__RECONFIGURE_HPP_
+#ifndef SUAVE_PLANTA__RECONFIGURE_HPP_
+#define SUAVE_PLANTA__RECONFIGURE_HPP_
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -22,7 +22,7 @@
 #include "system_modes_msgs/srv/change_mode.hpp"
 #include "system_modes_msgs/srv/get_mode.hpp"
 
-namespace suave_plansys
+namespace suave_planta
 {
 
 class Reconfigure : public plansys2::ActionExecutorClient
@@ -48,6 +48,6 @@ private:
 
 };
 
-} // end SUAVE_PLANSYS
+} // end SUAVE_PLANTA
 
 #endif

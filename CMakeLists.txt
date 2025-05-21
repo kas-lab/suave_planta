@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(suave_planning)
+project(suave_planta)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -51,8 +51,8 @@ ament_target_dependencies(action_recharge ${dependencies})
 add_executable(action_reconfigure src/action_reconfigure.cpp)
 ament_target_dependencies(action_reconfigure ${dependencies})
 
-add_executable(suave_plansys_controller src/suave_plansys_controller.cpp)
-ament_target_dependencies(suave_plansys_controller ${dependencies})
+add_executable(suave_planta_controller src/suave_planta_controller.cpp)
+ament_target_dependencies(suave_planta_controller ${dependencies})
 
 
 install(TARGETS
@@ -61,7 +61,7 @@ install(TARGETS
   action_start_robot
   action_recharge
   action_reconfigure
-  suave_plansys_controller
+  suave_planta_controller
   DESTINATION lib/${PROJECT_NAME}
 )
 

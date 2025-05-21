@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "suave_planning/action_reconfigure.hpp"
+#include "suave_planta/action_reconfigure.hpp"
 
 using namespace std::chrono_literals;
 using namespace std::placeholders;
-namespace suave_plansys
+namespace suave_planta
 {
 
   Reconfigure::Reconfigure(const std::string & node_name,
@@ -76,7 +76,7 @@ namespace suave_plansys
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<suave_plansys::Reconfigure>(
+  auto node = std::make_shared<suave_planta::Reconfigure>(
     "reconfigure", 500ms);
 
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);

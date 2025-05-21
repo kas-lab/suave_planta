@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>suave_planning</name>
+  <name>suave_planta</name>
   <version>0.0.0</version>
   <description>PDDL-based managing system for SUAVE</description>
   <maintainer email="g.rezendesilva@tudelft.nl">Gustavo Rezende</maintainer>
@@ -11,6 +11,8 @@
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <depend>system_modes</depend>
+  <depend>system_modes_msgs</depend>
   <depend>suave</depend>
   <depend>suave_msgs</depend>
   <depend>mavros</depend>

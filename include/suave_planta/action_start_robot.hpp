@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef SUAVE_PLANSYS__START_ROBOT_HPP_
-#define SUAVE_PLANSYS__START_ROBOT_HPP_
+#ifndef SUAVE_PLANTA__START_ROBOT_HPP_
+#define SUAVE_PLANTA__START_ROBOT_HPP_
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -22,7 +22,7 @@
 #include "mavros_msgs/srv/set_mode.hpp"
 #include "mavros_msgs/msg/state.hpp"
 
-namespace suave_plansys
+namespace suave_planta
 {
 
 class StartRobot : public plansys2::ActionExecutorClient
@@ -51,6 +51,6 @@ private:
   void do_work();
 };
 
-} // end SUAVE_PLANSYS
+} // end SUAVE_PLANTA
 
 #endif

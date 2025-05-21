@@ -17,12 +17,12 @@
 #include "std_srvs/srv/empty.hpp"
 #include "lifecycle_msgs/msg/transition_event.hpp"
 
-#include "suave_planning/suave_plansys_controller.hpp"
+#include "suave_planta/suave_planta_controller.hpp"
 
 using namespace std::chrono_literals;
 using namespace std::placeholders;
 
-namespace suave_plansys
+namespace suave_planta
 {
 
   SuavePlansysController::SuavePlansysController(const std::string & node_name)
@@ -35,7 +35,7 @@ void SuavePlansysController::init(){
   domain_expert_ = std::make_shared<plansys2::DomainExpertClient>();
   planner_client_ = std::make_shared<plansys2::PlannerClient>();
   problem_expert_ = std::make_shared<plansys2::ProblemExpertClient>();
-  executor_client_ = std::make_shared<plansys2::ExecutorClient>("suave_plansys_controller_executor");
+  executor_client_ = std::make_shared<plansys2::ExecutorClient>("suave_planta_controller_executor");
 
   step_timer_cb_group_ = this->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -242,16 +242,16 @@ void SuavePlansysController::search_pipeline_transition_cb_(const lifecycle_msgs
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<suave_plansys::SuavePlansysController>(
-    "suave_plansys_controller");
+  auto node = std::make_shared<suave_planta::SuavePlansysController>(
+    "suave_planta_controller");
 
   node->init();
 
   rclcpp::Rate rate(5);
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
-  // executor.add_node(std::make_shared<suave_plansys::SuavePlansysController>(
-  //   "suave_plansys_controller"));
+  // executor.add_node(std::make_shared<suave_planta::SuavePlansysController>(
+  //   "suave_planta_controller"));
   executor.spin();
   executor.remove_node(node);
   rclcpp::shutdown();

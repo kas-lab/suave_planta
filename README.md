@@ -9,6 +9,7 @@ ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p --owl=owl/suave.owl --tBox --i
 ```bash
 ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave.owl -p in_domain_file:=pddl/suave_domain.pddl -p out_domain_file:=pddl/suave_domain_created.pddl -p in_problem_file:=pddl/suave_problem.pddl -p out_problem_file:=pddl/suave_problem_created.pddl
 ```
+
 ## Planning with fast downward
 
 ```bash

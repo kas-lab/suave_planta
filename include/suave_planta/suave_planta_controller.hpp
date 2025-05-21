@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef SUAVE_PLANSY__SUAVE_PLANSYS_CONTROLLER_HPP_
-#define SUAVE_PLANSY__SUAVE_PLANSYS_CONTROLLER_HPP_
+#ifndef SUAVE_PLANTA__SUAVE_PLANTA_CONTROLLER_HPP_
+#define SUAVE_PLANTA__SUAVE_PLANTA_CONTROLLER_HPP_
 
 #include <algorithm>
 
@@ -25,9 +25,9 @@
 #include "plansys2_planner/PlannerClient.hpp"
 #include "plansys2_problem_expert/ProblemExpertClient.hpp"
 
-// #include "suave_plansys/visibility_control.h"
+// #include "suave_planta/visibility_control.h"
 
-namespace suave_plansys
+namespace suave_planta
 {
 
 class SuavePlansysController : public rclcpp::Node
@@ -72,6 +72,6 @@ protected:
   void search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg);
 };
 
-}  // namespace suave_plansys
+}  // namespace suave_planta
 
-#endif  // SUAVE_PLANSY__SUAVE_PLANSYS_CONTROLLER_HPP_
+#endif  // SUAVE_PLANTA__SUAVE_PLANTA_CONTROLLER_HPP_

@@ -17,6 +17,7 @@ find_package(plansys2_domain_expert REQUIRED)
 find_package(plansys2_problem_expert REQUIRED)
 find_package(plansys2_planner REQUIRED)
 find_package(system_modes_msgs REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 
 set(dependencies
   ament_cmake
@@ -30,6 +31,7 @@ set(dependencies
   plansys2_problem_expert
   plansys2_planner
   system_modes_msgs
+  lifecycle_msgs
 )
 
 include_directories(

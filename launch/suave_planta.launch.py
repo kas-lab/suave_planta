@@ -157,7 +157,14 @@ def generate_launch_description():
         package='suave_planta',
         executable='action_reconfigure',
         name='reconfigure_pddl_action_node',
-        parameters=[{'action_name': 'reconfigure'}]
+        parameters=[{'action_name': 'reconfigure1'}]
+    )
+    
+    reconfigure2_pddl_action_node = Node(
+        package='suave_planta',
+        executable='action_reconfigure',
+        name='reconfigure_pddl_action_node',
+        parameters=[{'action_name': 'reconfigure2'}]
     )
 
     return LaunchDescription([
@@ -177,4 +184,5 @@ def generate_launch_description():
         search_pipeline_pddl_action_node,
         inspect_pipeline_pddl_action_node,
         reconfigure_pddl_action_node,
+        reconfigure2_pddl_action_node
     ])

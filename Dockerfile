@@ -2,6 +2,7 @@ FROM ghcr.io/kas-lab/suave_rosa-headless:latest
 
 RUN sudo apt update && sudo apt install -y \
     openjdk-17-jdk \
+    gdb \
     && sudo rm -rf /var/lib/apt/list/
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64

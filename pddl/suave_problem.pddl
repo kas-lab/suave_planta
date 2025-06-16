@@ -7,7 +7,8 @@
   )
 
   (:init
-    ;(hasValue obs_water_visibility 2.5_decimal)
+    ;(qa_has_value obs_water_visibility 2.5_decimal)
+    (robot_not_started bluerov)
   )
 
   (:goal (and

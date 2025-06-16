@@ -15,7 +15,8 @@ planner:
       plugin: "plansys2/DownwardPlanner"
 executor:
   ros__parameters:
-    bt_builder_plugin: "SimpleBTBuilder"
+    bt_builder_plugin: "SequentialBTBuilder"
+    # bt_builder_plugin: "SimpleBTBuilder"
     # bt_builder_plugin: "STNBTBuilder"
 domain_expert:
   ros__parameters:

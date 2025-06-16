@@ -40,13 +40,13 @@ void SuavePlansysController::init(){
   step_timer_cb_group_ = this->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   step_timer_ = this->create_wall_timer(
-    1s, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
+    100ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
 
   save_mission_results_cli =
     this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
 
   search_pipeline_transition_sub_  = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
-    "/search_pipeline/transition_event",
+    "/f_generate_search_path_node/transition_event",
     10,
     std::bind(&SuavePlansysController::search_pipeline_transition_cb_, this, _1));
 
@@ -89,8 +89,11 @@ void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::Diagnost
           }
         }
 
-        add_symbolic_number(value.value);
-        auto add_predicate_str = "(qa_has_value obs_" + value.key + " " + value.value + "_decimal)";
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(2) << std::stod(value.value);
+        std::string value_two_decimals = oss.str();
+        add_symbolic_number(value_two_decimals);
+        auto add_predicate_str = "(qa_has_value obs_" + value.key + " " + value_two_decimals + "_decimal)";
         problem_expert_->addPredicate(parser::pddl::fromStringPredicate(add_predicate_str));
       }
     }
@@ -105,25 +108,50 @@ void SuavePlansysController::add_symbolic_number(std::string number_str)
   problem_expert_->addInstance(parser::pddl::fromStringParam(
     number_decimal, "numerical-object"));
 
-  problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-    "(equalTo " + number_decimal + " " + number_decimal + ")"));
+  if (number_float < 0.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 0.25_decimal)"));
+  } else if (number_float < 0.5) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 0.5_decimal)"));
+  } else if (number_float < 0.75) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 0.75_decimal)"));
+  } else if (number_float < 1.0) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 1.0_decimal)"));
+  } else if (number_float < 1.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 1.25_decimal)"));
+  } else if (number_float < 2.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 2.25_decimal)"));
+  } else if (number_float < 3.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan " + number_decimal + " 3.25_decimal)"));
+  }
 
-  auto instances = problem_expert_->getInstances();
-
-  for (const auto& instance: instances) {
-    if (instance.type != "numerical-object") {
-      continue;
-    }
-
-    float number_float_2 = std::stof(instance.name.substr(0, instance.name.find("_")));
-
-    if (number_float < number_float_2) {
-      problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-        "(lessThan " + number_decimal + " " + instance.name + ")"));
-    } else if (number_float_2 < number_float) {
-      problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-        "(lessThan " + instance.name + " " + number_decimal + ")"));
-    }
+  if (number_float > 0.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 0.25_decimal " + number_decimal + ")"));
+  } else if (number_float > 0.5) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 0.5_decimal " + number_decimal + ")"));
+  } else if (number_float > 0.75) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 0.75_decimal " + number_decimal + ")"));
+  } else if (number_float > 1.0) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 1.0_decimal " + number_decimal + ")"));
+  } else if (number_float > 1.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 1.25_decimal " + number_decimal + ")"));
+  } else if (number_float > 2.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 2.25_decimal " + number_decimal + ")"));
+  } else if (number_float > 3.25) {
+    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
+      "(lessthan 3.25_decimal " + number_decimal + ")"));
   }
 }
 
@@ -131,7 +159,7 @@ SuavePlansysController::~SuavePlansysController()
 {
 }
 
-void SuavePlansysController::execute_plan(){
+bool SuavePlansysController::execute_plan(){
   // Compute the plan
   auto domain = domain_expert_->getDomain();
   auto problem = problem_expert_->getProblem();
@@ -149,7 +177,7 @@ void SuavePlansysController::execute_plan(){
 
     std::cout << "Could not find plan to reach goal " <<
      parser::pddl::toString(problem_expert_->getGoal()) << std::endl;
-    return;
+    return false;
   }
 
   std::cout << "Selected plan: " << std::endl;
@@ -157,7 +185,7 @@ void SuavePlansysController::execute_plan(){
     RCLCPP_INFO(get_logger(), "  Action: '%s'", item.action.c_str());
   }
   // Execute the plan
-  executor_client_->start_plan_execution(plan.value());
+  return executor_client_->start_plan_execution(plan.value());
 }
 
 void SuavePlansysController::finish_controlling(){
@@ -169,8 +197,7 @@ void SuavePlansysController::finish_controlling(){
 
 void SuavePlansysController::step(){
   if (first_iteration_){
-    execute_plan();
-    first_iteration_ = false;
+    first_iteration_ = !execute_plan();
     return;
   }
 
@@ -183,23 +210,6 @@ void SuavePlansysController::step(){
         execute_plan();
         return;
     }
-  }
-
-  auto feedback = executor_client_->getFeedBack();
-  for (const auto & action_feedback : feedback.action_execution_status) {
-    if (action_feedback.status == plansys2_msgs::msg::ActionExecutionInfo::FAILED) {
-      std::string error_str_ = "[" + action_feedback.action + "] finished with error: " + action_feedback.message_status;
-      RCLCPP_ERROR(get_logger(), error_str_.c_str());
-      break;
-    }
-
-    // std::string arguments_str_ = " ";
-    // for (const auto & arguments: action_feedback.arguments){
-    //   arguments_str_ += arguments + " ";
-    // }
-    // std::string feedback_str_ = "[" + action_feedback.action + arguments_str_ +
-    //   std::to_string(action_feedback.completion * 100.0) + "%]";
-    // RCLCPP_INFO(get_logger(), feedback_str_.c_str());
   }
 }
 
@@ -247,11 +257,8 @@ int main(int argc, char ** argv)
 
   node->init();
 
-  rclcpp::Rate rate(5);
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
-  // executor.add_node(std::make_shared<suave_planta::SuavePlansysController>(
-  //   "suave_planta_controller"));
   executor.spin();
   executor.remove_node(node);
   rclcpp::shutdown();

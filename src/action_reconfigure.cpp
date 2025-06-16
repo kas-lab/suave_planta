@@ -46,7 +46,13 @@ namespace suave_planta
   {
     auto action_arguments = this->get_arguments();
     std::string system_name = action_arguments[0];
-    std::string mode_name = action_arguments[2];
+    std::string mode_name;
+    
+    if(action_arguments.size() == 3) {  //  If reconfigure action has 3 arguments (f fd_initial fd_goal)
+      mode_name = action_arguments[2];
+    } else {
+      mode_name = action_arguments[1];  // If reconfigure action has 2 arguments (f fd_goal)
+    }
 
     if (!change_mode_cli_map_.count(system_name)) {
       change_mode_cli_map_[system_name] = create_client<system_modes_msgs::srv::ChangeMode>(

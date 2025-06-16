@@ -49,7 +49,7 @@ protected:
   std::shared_ptr<plansys2::ExecutorClient> executor_client_;
 
   bool first_iteration_ = true;
-  void execute_plan();
+  bool execute_plan();
 
   rclcpp::Time _start_time;
   bool _search_started = false;

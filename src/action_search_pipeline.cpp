@@ -31,7 +31,7 @@ public:
 private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr pipeline_detection_sub_;
 
-  bool _pipeline_detected=false;
+  bool _pipeline_detected = false;
   void pipeline_detected_cb(const std_msgs::msg::Bool &msg){
     _pipeline_detected = msg.data;
   };
@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<SearchPipelineAction>(
-    "search_pipeline", 500ms);
+    "search_pipeline", 100ms);
 
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

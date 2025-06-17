@@ -58,6 +58,7 @@ protected:
 
   rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>::SharedPtr search_pipeline_transition_sub_;
   rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagnostics_sub_;
+  rclcpp::CallbackGroup::SharedPtr diagnostics_sub_cb_group_;
 
   void diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg);
   void add_symbolic_number(std::string number);

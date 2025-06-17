@@ -57,10 +57,14 @@ void SuavePlansysController::init(){
 
   this->declare_parameter("time_limit", 300);
 
+  diagnostics_sub_cb_group_ = this->create_callback_group(
+    rclcpp::CallbackGroupType::MutuallyExclusive);
+  rclcpp::SubscriptionOptions diagnostics_sub_options;
+  diagnostics_sub_options.callback_group = diagnostics_sub_cb_group_;
   diagnostics_sub_  = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
     "/diagnostics",
     10,
-    std::bind(&SuavePlansysController::diagnostics_cb, this, _1));
+    std::bind(&SuavePlansysController::diagnostics_cb, this, _1), diagnostics_sub_options);
 }
 
 void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg){

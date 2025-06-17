@@ -7,7 +7,7 @@ A PDDL-based managing system for SUAVE
 Run docker image without web interface (with nvidia)(don't forget to install the [docker-nvidia-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html))
 
 ```Bash
-docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro ghcr.io/kas-lab/suave_planta:main
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v $HOME/suave/results:/home/ubuntu-user/suave/results -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro ghcr.io/kas-lab/suave_planta:main
 ```
 
 **DEV**
@@ -16,7 +16,7 @@ docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$
 ```
 
 ```Bash
-docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $HOME/suave_ws/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 suave_planta
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v $HOME/suave/results:/home/ubuntu-user/suave/results -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $HOME/suave_ws/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 suave_planta
 ```
 
 ## Run SUAVE with PLANTA
@@ -31,16 +31,16 @@ ros2 launch suave_planta suave_runner_launch.py
 
 **Changing experiments config:** Simply change the [runner_config.yml](config/runner_config.yml) file
 
-
 Or you can run it with the suave_runner ros node:
 ```Bash
 ros2 run suave_runner suave_runner \
   --ros-args \
   -p gui:=False \
+  -p experiment_logging:=True \
   -p experiments:='[
-    "{\"experiment_launch\": \"ros2 launch suave_rosa_bt suave_rosa_bt.launch.py\", \
-      \"num_runs\": 1, \
-      \"adaptation_manager\": \"rosa_bt\", \
+    "{\"experiment_launch\": \"ros2 launch suave_planta suave_planta.launch.py\", \
+      \"num_runs\": 20, \
+      \"adaptation_manager\": \"planta\", \
       \"mission_name\": \"suave\"}"
   ]'
 ```

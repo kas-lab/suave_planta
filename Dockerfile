@@ -21,4 +21,6 @@ RUN ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash \
 RUN ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash \
     && colcon build --symlink-install"]
 
+RUN mkdir -p $HOME/suave/results
+
 RUN sudo apt autoremove -y && sudo rm -rf /var/lib/apt/lists/

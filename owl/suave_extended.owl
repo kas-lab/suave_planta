@@ -1,0 +1,811 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.metacontrol.org/suave#"
+     xml:base="http://www.metacontrol.org/suave"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:suave="http://www.metacontrol.org/suave#"
+     xmlns:swrla="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+     xmlns:tomasys="http://www.metacontrol.org/tomasys#">
+    <owl:Ontology rdf:about="http://www.metacontrol.org/suave">
+        <owl:imports rdf:resource="https://raw.githubusercontent.com/kas-lab/pddl_tomasys/refs/heads/main/config/pddl_tomasys.owl"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.metacontrol.org/suave#a_inspect_pipeline -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#a_inspect_pipeline">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Action"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_follow_pipeline"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#a_recharge_battery -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#a_recharge_battery">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Action"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#generate_recharge_path"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#a_search_pipeline -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#a_search_pipeline">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Action"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
+        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#battery_level -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#battery_level">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QualityAttributeType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_1">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_2 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_2">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_3">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_4 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_4">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_5 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_5">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#c_thruster_6 -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#c_thruster_6">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Component"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#f_follow_pipeline -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#f_follow_pipeline">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#f_generate_search_path -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#f_generate_search_path">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#f_maintain_motion -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#f_maintain_motion">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_all_thrusters -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_all_thrusters">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_motion_efficiency_normal"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_1"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_2"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_3"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_4"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_5"/>
+        <tomasys:requiresC rdf:resource="http://www.metacontrol.org/suave#c_thruster_6"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_follow_pipeline -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_follow_pipeline">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_inspect_efficiency_high"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_follow_pipeline"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_recharge_path -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_recharge_path">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#generate_recharge_path"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_recover_thrusters -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_recover_thrusters">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_motion_efficiency_degraded"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_spiral_high -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_spiral_high">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_search_efficiency_high"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_water_visibility_high"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_spiral_low -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_spiral_low">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_search_efficiency_low"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_water_visibility_low"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#fd_spiral_medium -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_spiral_medium">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_search_efficiency_medium"/>
+        <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_water_visibility_medium"/>
+        <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#generate_recharge_path -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#generate_recharge_path">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#obs_battery_level -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#obs_battery_level">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#battery_level"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#obs_water_visibility -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#obs_water_visibility">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_inspect_efficiency_high -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_inspect_efficiency_high">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1.0</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_motion_efficiency_degraded -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_motion_efficiency_degraded">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.75</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_motion_efficiency_normal -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_motion_efficiency_normal">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1.0</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_search_efficiency_high -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_search_efficiency_high">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1.0</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_search_efficiency_low -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_search_efficiency_low">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.25</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_search_efficiency_medium -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_search_efficiency_medium">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">0.5</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_water_visibility_high -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_water_visibility_high">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">3.25</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_water_visibility_low -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_water_visibility_low">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">1.25</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#qa_water_visibility_medium -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#qa_water_visibility_medium">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+        <tomasys:qa_has_value rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">2.25</tomasys:qa_has_value>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.metacontrol.org/suave#water_visibility -->
+
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#water_visibility">
+        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QualityAttributeType"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Rules
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#fd">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#f">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#qa">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#qav">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#fd1">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#eqa">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#eqav">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#mqa">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description rdf:about="http://www.metacontrol.org/suave#mqav">
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Variable"/>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f_follow_pipeline_utility</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#f_follow_pipeline"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#solvesF"/>
+                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#f"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#hasQAestimation"/>
+                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#isQAtype"/>
+                                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#qa_has_value"/>
+                                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#fd_utility"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f_generate_search_path_utility</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#solvesF"/>
+                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#f"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#hasQAestimation"/>
+                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#isQAtype"/>
+                                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#qa_has_value"/>
+                                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#fd_utility"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f_maintain_motion_utility</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#solvesF"/>
+                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#f"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#hasQAestimation"/>
+                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#isQAtype"/>
+                                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/tomasys#performance"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#qa_has_value"/>
+                                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#qa"/>
+                                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#fd_utility"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd"/>
+                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#qav"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+    <rdf:Description>
+        <swrla:isRuleEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</swrla:isRuleEnabled>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></rdfs:comment>
+        <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">water_visibility</rdfs:label>
+        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#Imp"/>
+        <swrl:body>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                        <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd1"/>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                        <rdf:first>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#hasQAestimation"/>
+                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd1"/>
+                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#eqa"/>
+                            </rdf:Description>
+                        </rdf:first>
+                        <rdf:rest>
+                            <rdf:Description>
+                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                <rdf:first>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#isQAtype"/>
+                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#eqa"/>
+                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+                                    </rdf:Description>
+                                </rdf:first>
+                                <rdf:rest>
+                                    <rdf:Description>
+                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                        <rdf:first>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#qa_has_value"/>
+                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#eqa"/>
+                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#eqav"/>
+                                            </rdf:Description>
+                                        </rdf:first>
+                                        <rdf:rest>
+                                            <rdf:Description>
+                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                <rdf:first>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#ClassAtom"/>
+                                                        <swrl:classPredicate rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
+                                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#mqa"/>
+                                                    </rdf:Description>
+                                                </rdf:first>
+                                                <rdf:rest>
+                                                    <rdf:Description>
+                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                        <rdf:first>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#SameIndividualAtom"/>
+                                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#mqa"/>
+                                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#obs_water_visibility"/>
+                                                            </rdf:Description>
+                                                        </rdf:first>
+                                                        <rdf:rest>
+                                                            <rdf:Description>
+                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                <rdf:first>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                                                                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#qa_has_value"/>
+                                                                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#mqa"/>
+                                                                        <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#mqav"/>
+                                                                    </rdf:Description>
+                                                                </rdf:first>
+                                                                <rdf:rest>
+                                                                    <rdf:Description>
+                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                        <rdf:first>
+                                                                            <rdf:Description>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#IndividualPropertyAtom"/>
+                                                                                <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#isQAtype"/>
+                                                                                <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#mqa"/>
+                                                                                <swrl:argument2 rdf:resource="http://www.metacontrol.org/suave#water_visibility"/>
+                                                                            </rdf:Description>
+                                                                        </rdf:first>
+                                                                        <rdf:rest>
+                                                                            <rdf:Description>
+                                                                                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                                                                                <rdf:first>
+                                                                                    <rdf:Description>
+                                                                                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#BuiltinAtom"/>
+                                                                                        <swrl:builtin rdf:resource="http://www.w3.org/2003/11/swrlb#lessThan"/>
+                                                                                        <swrl:arguments rdf:parseType="Collection">
+                                                                                            <rdf:Description rdf:about="http://www.metacontrol.org/suave#mqav"/>
+                                                                                            <rdf:Description rdf:about="http://www.metacontrol.org/suave#eqav"/>
+                                                                                        </swrl:arguments>
+                                                                                    </rdf:Description>
+                                                                                </rdf:first>
+                                                                                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                                                                            </rdf:Description>
+                                                                        </rdf:rest>
+                                                                    </rdf:Description>
+                                                                </rdf:rest>
+                                                            </rdf:Description>
+                                                        </rdf:rest>
+                                                    </rdf:Description>
+                                                </rdf:rest>
+                                            </rdf:Description>
+                                        </rdf:rest>
+                                    </rdf:Description>
+                                </rdf:rest>
+                            </rdf:Description>
+                        </rdf:rest>
+                    </rdf:Description>
+                </rdf:rest>
+            </rdf:Description>
+        </swrl:body>
+        <swrl:head>
+            <rdf:Description>
+                <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#AtomList"/>
+                <rdf:first>
+                    <rdf:Description>
+                        <rdf:type rdf:resource="http://www.w3.org/2003/11/swrl#DatavaluedPropertyAtom"/>
+                        <swrl:propertyPredicate rdf:resource="http://www.metacontrol.org/tomasys#fd_realisability"/>
+                        <swrl:argument1 rdf:resource="http://www.metacontrol.org/suave#fd1"/>
+                        <swrl:argument2 rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</swrl:argument2>
+                    </rdf:Description>
+                </rdf:first>
+                <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+            </rdf:Description>
+        </swrl:head>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

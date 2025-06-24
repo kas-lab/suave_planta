@@ -12,7 +12,7 @@ docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$
 
 **DEV**
 ```Bash
-docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta ghcr.io/kas-lab/suave_planta:latest
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave/results:/home/ubuntu-user/suave/results ghcr.io/kas-lab/suave_planta:main
 ```
 
 ```Bash
@@ -45,6 +45,31 @@ ros2 run suave_runner suave_runner \
   ]'
 ```
 
+SUAVE extended
+```Bash
+ros2 run suave_runner suave_runner \
+  --ros-args \
+  -p gui:=False \
+  -p experiment_logging:=True \
+  -p experiments:='[
+    "{\"experiment_launch\": \"ros2 launch suave_planta suave_planta_extended.launch.py\", \
+      \"num_runs\": 20, \
+      \"adaptation_manager\": \"planta\", \
+      \"mission_name\": \"suave_extended\"}"
+  ]'
+```
+
+ros2 run suave_runner suave_runner \
+  --ros-args \
+  -p gui:=False \
+  -p experiment_logging:=True \
+  -p experiments:='[
+    "{\"experiment_launch\": \"ros2 launch suave_none suave_none.launch.py\", \
+      \"num_runs\": 2, \
+      \"adaptation_manager\": \"none\", \
+      \"mission_name\": \"suave\"}"
+  ]'
+
 ### Manually
 
 ```Bash
@@ -67,6 +92,11 @@ With ROS:
 ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave.owl -p in_domain_file:=pddl/suave_domain.pddl -p out_domain_file:=pddl/suave_domain_created.pddl -p in_problem_file:=pddl/suave_problem.pddl -p out_problem_file:=pddl/suave_problem_created.pddl
 ```
 
+SUAVE extended
+```bash
+ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave_extended.owl -p in_domain_file:=pddl/suave_domain_extended.pddl -p out_domain_file:=pddl/suave_domain_extended_created.pddl -p in_problem_file:=pddl/suave_problem_extended.pddl -p out_problem_file:=pddl/suave_problem_extended_created.pddl
+```
+
 Without ROS:
 ```bash
 OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outDomain=pddl/suave_test.pddl --aBox --inProblem=pddl/suave_problem.pddl --outProblem=pddl/suave_test.pddl --ignore-data-props --add-num-comparisons
@@ -76,4 +106,9 @@ OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outD
 
 ```bash
 ros2 run downward_ros fast-downward.py pddl/suave_domain_created.pddl pddl/suave_problem_created.pddl --search 'astar(blind())'
+```
+
+SUAVE extended:
+```bash
+ros2 run downward_ros fast-downward.py pddl/suave_domain_extended_created.pddl pddl/suave_problem_extended_created.pddl --search 'astar(blind())'
 ```

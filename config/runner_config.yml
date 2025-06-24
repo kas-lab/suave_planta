@@ -12,6 +12,13 @@
         }
       - |
         {
+          "experiment_launch": "ros2 launch suave_planta suave_planta_extended.launch.py",
+          "num_runs": 20,
+          "adaptation_manager": "planta",
+          "mission_name": "suave_extended"
+        }
+      - |
+        {
           "experiment_launch": "ros2 launch suave_rosa suave_rosa_bt.launch.py",
           "num_runs": 20,
           "adaptation_manager": "rosa",

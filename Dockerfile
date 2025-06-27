@@ -1,4 +1,5 @@
-FROM ghcr.io/kas-lab/suave_rosa-headless:latest
+ARG BASE_IMAGE=ghcr.io/kas-lab/suave_rosa-headless:latest
+FROM $BASE_IMAGE
 
 RUN sudo apt update && sudo apt install -y \
     openjdk-17-jdk \

@@ -40,8 +40,14 @@ def generate_launch_description():
             logging.getLogger().setLevel(logging.CRITICAL)
         return []
 
-    result_filename = LaunchConfiguration('result_filename')
+    result_path = LaunchConfiguration('result_path')
+    result_path_arg = DeclareLaunchArgument(
+        'result_path',
+        default_value='~/suave/results',
+        description='Path where to save the results'
+    )
 
+    result_filename = LaunchConfiguration('result_filename')
     result_filename_arg = DeclareLaunchArgument(
         'result_filename',
         default_value='',
@@ -64,6 +70,7 @@ def generate_launch_description():
     suave_planta_base = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(suave_planta_base_launch_path),
         launch_arguments={
+            'result_path': result_path,
             'result_filename': result_filename,
             'mission_config': mission_config,
         }.items()
@@ -168,6 +175,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        result_path_arg,
         result_filename_arg,
         silent_arg,
         OpaqueFunction(function=configure_logging),

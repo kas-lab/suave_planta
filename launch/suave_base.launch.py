@@ -40,6 +40,13 @@ def generate_launch_description():
     result_filename = LaunchConfiguration('result_filename')
     mission_config = LaunchConfiguration('mission_config')
 
+    result_path = LaunchConfiguration('result_path')
+    result_path_arg = DeclareLaunchArgument(
+        'result_path',
+        default_value='~/suave/results',
+        description='Path where to save the results'
+    )
+
     result_filename_arg = DeclareLaunchArgument(
         'result_filename',
         default_value='suave_planta_results',
@@ -78,11 +85,13 @@ def generate_launch_description():
         parameters=[mission_config, {
             'adaptation_manager': 'suave_planta',
             'mission_name': 'suave',
+            'result_path': result_path,
             'result_filename': result_filename,
         }],
     )
 
     return LaunchDescription([
+        result_path_arg,
         result_filename_arg,
         mission_config_arg,
         silent_arg,

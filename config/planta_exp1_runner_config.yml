@@ -26,9 +26,9 @@
         }
       - |
         {
-          "experiment_launch": "ros2 launch suave_rosa suave_rosa_bt.launch.py",
+          "experiment_launch": "ros2 launch suave_rosa_bt suave_rosa_bt.launch.py",
           "num_runs": 30,
-          "adaptation_manager": "rosa",
+          "adaptation_manager": "rosa_bt",
           "mission_name": "suave"
         }
       - |

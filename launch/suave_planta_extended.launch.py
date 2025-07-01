@@ -144,6 +144,8 @@ def generate_launch_description():
     suave_planta_controller_node = Node(
         package='suave_planta',
         executable='suave_planta_controller',
+        name="mission_node",
+        parameters=[mission_config],
     )
 
     start_robot_pddl_action_node = Node(

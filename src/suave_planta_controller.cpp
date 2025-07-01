@@ -257,7 +257,7 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<suave_planta::SuavePlansysController>(
-    "suave_planta_controller");
+    "mission_node");
 
   node->init();
 

@@ -76,6 +76,7 @@ install(DIRECTORY
   pddl
   config
   owl
+  results
   DESTINATION share/${PROJECT_NAME}
 )
 

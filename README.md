@@ -19,6 +19,11 @@ docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$
 docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v $HOME/suave/results:/home/ubuntu-user/suave/results -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $HOME/suave_ws/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 suave_planta
 ```
 
+Mount `$HOME/suave/results`, `$HOME/suave_ws/src/suave`, `$HOME/suave_ws/src/suave_planta`, and `$HOME/suave_ws/src/ros2_planning_system`
+```Bash
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave/results:/home/ubuntu-user/suave/results -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $HOME/suave_ws/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 -v $HOME/suave_ws/src/suave:/home/ubuntu-user/suave_ws/src/suave suave_planta
+```
+
 ## Run SUAVE with PLANTA
 
 ### With Runner
@@ -111,4 +116,10 @@ ros2 run downward_ros fast-downward.py pddl/suave_domain_created.pddl pddl/suave
 SUAVE extended:
 ```bash
 ros2 run downward_ros fast-downward.py pddl/suave_domain_extended_created.pddl pddl/suave_problem_extended_created.pddl --search 'astar(blind())'
+```
+
+## Statistical analysis of results
+
+```Bash
+ros2 launch suave_planta exp1_analysis.launch.py
 ```

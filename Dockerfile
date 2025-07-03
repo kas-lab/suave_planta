@@ -14,6 +14,7 @@ COPY --chown=ubuntu-user:ubuntu-user launch/ $HOME/suave_ws/src/suave_planta/lau
 COPY --chown=ubuntu-user:ubuntu-user owl/ $HOME/suave_ws/src/suave_planta/owl/
 COPY --chown=ubuntu-user:ubuntu-user pddl/ $HOME/suave_ws/src/suave_planta/pddl/
 COPY --chown=ubuntu-user:ubuntu-user src/ $HOME/suave_ws/src/suave_planta/src/
+COPY --chown=ubuntu-user:ubuntu-user results/ $HOME/suave_ws/src/suave_planta/results/
 COPY --chown=ubuntu-user:ubuntu-user CMakeLists.txt $HOME/suave_ws/src/suave_planta/CMakeLists.txt
 COPY --chown=ubuntu-user:ubuntu-user package.xml $HOME/suave_ws/src/suave_planta/package.xml
 COPY --chown=ubuntu-user:ubuntu-user suave_planta.repos $HOME/suave_ws/src/suave_planta/suave_planta.repos

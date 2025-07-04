@@ -14,6 +14,10 @@
     robot
   )
 
+  (:constants
+    0.25_decimal 1.0_decimal - numerical-object 
+  )
+  
   (:predicates
     (pipeline_found ?p - pipeline)
     (pipeline_inspected ?p - pipeline)

@@ -10,7 +10,7 @@ def generate_launch_description():
     config_path = os.path.join(
         get_package_share_directory('suave_planta'),
         'config',
-        'planta_exp3_analysis_config.yml'
+        'exp3_analysis_config.yml'
     )
 
     # Launch the suave_runner node with the parameters loaded from YAML

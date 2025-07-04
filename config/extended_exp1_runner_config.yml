@@ -21,21 +21,21 @@
       - |
         {
           "experiment_launch": "ros2 launch suave_planta suave_planta_extended.launch.py",
-          "num_runs": 2,
+          "num_runs": 30,
           "adaptation_manager": "planta",
           "mission_name": "suave_extended"
         }
       - |
         {
           "experiment_launch": "ros2 launch suave_rosa_bt suave_rosa_extended_bt.launch.py",
-          "num_runs": 2,
+          "num_runs": 30,
           "adaptation_manager": "rosa_bt",
           "mission_name": "suave_extended"
         }
       - |
         {
           "experiment_launch": "ros2 launch suave_bt suave_bt_extended.launch.py",
-          "num_runs": 2,
+          "num_runs": 30,
           "adaptation_manager": "bt",
           "mission_name": "suave_extended"
         }

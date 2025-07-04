@@ -1,4 +1,4 @@
-(define (domain suave)
+(define (domain suave_extended)
   (:requirements
     :strips
     :typing

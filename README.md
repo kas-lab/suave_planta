@@ -104,7 +104,12 @@ ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave_extended.o
 
 Without ROS:
 ```bash
-OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outDomain=pddl/suave_test.pddl --aBox --inProblem=pddl/suave_problem.pddl --outProblem=pddl/suave_test.pddl --ignore-data-props --add-num-comparisons
+OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outDomain=pddl/suave_domain_test.pddl --aBox --inProblem=pddl/suave_problem.pddl --outProblem=pddl/suave_problem_test.pddl --add-num-comparisons --replace-output
+```
+
+SUAVE extended
+```bash
+OWLToPDDL.sh --owl=owl/suave_extended.owl --tBox --inDomain=pddl/suave_domain_extended.pddl --outDomain=pddl/suave_domain_extended_test.pddl --aBox --inProblem=pddl/suave_problem_extended.pddl --outProblem=pddl/suave_problem_extended_test.pddl --add-num-comparisons --replace-output
 ```
 
 ## Planning with fast downward

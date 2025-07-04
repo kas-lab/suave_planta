@@ -1,5 +1,5 @@
 (define (problem example-auv)
-  (:domain suave)
+  (:domain suave_extended)
 
   (:objects
     pipeline - pipeline

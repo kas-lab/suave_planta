@@ -164,9 +164,9 @@
     
 
 
-    <!-- http://www.metacontrol.org/suave#fd_recharge_path -->
+    <!-- http://www.metacontrol.org/suave#normal -->
 
-    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#fd_recharge_path">
+    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#normal">
         <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#FunctionDesign"/>
         <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#generate_recharge_path"/>
     </owl:NamedIndividual>

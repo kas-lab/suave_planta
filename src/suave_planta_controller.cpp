@@ -40,7 +40,7 @@ void SuavePlansysController::init(){
   step_timer_cb_group_ = this->create_callback_group(
     rclcpp::CallbackGroupType::MutuallyExclusive);
   step_timer_ = this->create_wall_timer(
-    100ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
+    500ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
 
   save_mission_results_cli =
     this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
@@ -170,21 +170,21 @@ bool SuavePlansysController::execute_plan(){
   auto plan = planner_client_->getPlan(domain, problem);
 
   if (!plan.has_value()) {
-    for (auto instance: problem_expert_->getInstances()){
-      std::cout<<"Instance "<< instance.name.c_str() << " type " <<
-        instance.type.c_str() << std::endl;
-    }
-    for (auto predicate: problem_expert_->getPredicates()) {
-      std::cout << "Predicates: " << std::endl;
-      std::cout << parser::pddl::toString(predicate)<<std::endl;
-    }
+    // for (auto instance: problem_expert_->getInstances()){
+    //   std::string instance_info = "Instance " + instance.name + " type " + instance.type;
+    //   RCLCPP_INFO(get_logger(), "%s", instance_info.c_str());
+    // }
+    // for (auto predicate: problem_expert_->getPredicates()) {
+    //   std::string predicate_str = parser::pddl::toString(predicate);
+    //   RCLCPP_INFO(get_logger(), "Predicate: %s", predicate_str.c_str());
+    // }
 
-    std::cout << "Could not find plan to reach goal " <<
-     parser::pddl::toString(problem_expert_->getGoal()) << std::endl;
+    std::string goal_str = "Could not find plan to reach goal " + parser::pddl::toString(problem_expert_->getGoal());
+    RCLCPP_INFO(get_logger(), "%s", goal_str.c_str());
     return false;
   }
 
-  std::cout << "Selected plan: " << std::endl;
+  RCLCPP_INFO(get_logger(), "Selected plan: ");
   for (auto item : plan->items){
     RCLCPP_INFO(get_logger(), "  Action: '%s'", item.action.c_str());
   }
@@ -210,9 +210,9 @@ void SuavePlansysController::step(){
       RCLCPP_INFO(get_logger(), "Plan execution finished with success!");
       finish_controlling();
     } else {
-        RCLCPP_INFO(get_logger(), "Replanning!");
-        execute_plan();
-        return;
+      RCLCPP_INFO(get_logger(), "Replanning!");
+      execute_plan();
+      return;
     }
   }
 }

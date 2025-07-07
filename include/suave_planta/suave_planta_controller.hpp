@@ -61,7 +61,9 @@ protected:
   rclcpp::CallbackGroup::SharedPtr diagnostics_sub_cb_group_;
 
   void diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg);
-  void add_symbolic_number(std::string number);
+
+  std::unordered_set<std::string> numbers_added_;
+  std::vector<plansys2::Predicate> add_symbolic_number(const std::string& number);
 
   rclcpp::CallbackGroup::SharedPtr time_limit_timer_cb_group_;
   rclcpp::TimerBase::SharedPtr time_limit_timer_;

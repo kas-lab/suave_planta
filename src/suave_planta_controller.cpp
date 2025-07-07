@@ -25,239 +25,296 @@ using namespace std::placeholders;
 namespace suave_planta
 {
 
-  SuavePlansysController::SuavePlansysController(const std::string & node_name)
-  : Node(node_name), _time_limit(300)
-{
+  SuavePlansysController::SuavePlansysController(const std::string &node_name)
+      : Node(node_name), _time_limit(300)
+  {
+  }
 
-}
+  void SuavePlansysController::init()
+  {
+    domain_expert_ = std::make_shared<plansys2::DomainExpertClient>();
+    planner_client_ = std::make_shared<plansys2::PlannerClient>();
+    problem_expert_ = std::make_shared<plansys2::ProblemExpertClient>();
+    executor_client_ = std::make_shared<plansys2::ExecutorClient>("suave_planta_controller_executor");
 
-void SuavePlansysController::init(){
-  domain_expert_ = std::make_shared<plansys2::DomainExpertClient>();
-  planner_client_ = std::make_shared<plansys2::PlannerClient>();
-  problem_expert_ = std::make_shared<plansys2::ProblemExpertClient>();
-  executor_client_ = std::make_shared<plansys2::ExecutorClient>("suave_planta_controller_executor");
+    step_timer_cb_group_ = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    step_timer_ = this->create_wall_timer(
+        500ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
 
-  step_timer_cb_group_ = this->create_callback_group(
-    rclcpp::CallbackGroupType::MutuallyExclusive);
-  step_timer_ = this->create_wall_timer(
-    500ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
+    save_mission_results_cli =
+        this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
 
-  save_mission_results_cli =
-    this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
+    search_pipeline_transition_sub_ = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
+        "/f_generate_search_path_node/transition_event",
+        10,
+        std::bind(&SuavePlansysController::search_pipeline_transition_cb_, this, _1));
 
-  search_pipeline_transition_sub_  = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
-    "/f_generate_search_path_node/transition_event",
-    10,
-    std::bind(&SuavePlansysController::search_pipeline_transition_cb_, this, _1));
+    time_limit_timer_cb_group_ = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    time_limit_timer_ = this->create_wall_timer(
+        100ms, std::bind(&SuavePlansysController::time_limit_cb, this), time_limit_timer_cb_group_);
 
-  time_limit_timer_cb_group_ = this->create_callback_group(
-    rclcpp::CallbackGroupType::MutuallyExclusive);
-  time_limit_timer_ = this->create_wall_timer(
-    100ms, std::bind(&SuavePlansysController::time_limit_cb, this), time_limit_timer_cb_group_);
+    this->declare_parameter("time_limit", 300);
 
-  this->declare_parameter("time_limit", 300);
+    diagnostics_sub_cb_group_ = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    rclcpp::SubscriptionOptions diagnostics_sub_options;
+    diagnostics_sub_options.callback_group = diagnostics_sub_cb_group_;
+    diagnostics_sub_ = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+        "/diagnostics",
+        10,
+        std::bind(&SuavePlansysController::diagnostics_cb, this, _1), diagnostics_sub_options);
+  }
 
-  diagnostics_sub_cb_group_ = this->create_callback_group(
-    rclcpp::CallbackGroupType::MutuallyExclusive);
-  rclcpp::SubscriptionOptions diagnostics_sub_options;
-  diagnostics_sub_options.callback_group = diagnostics_sub_cb_group_;
-  diagnostics_sub_  = this->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
-    "/diagnostics",
-    10,
-    std::bind(&SuavePlansysController::diagnostics_cb, this, _1), diagnostics_sub_options);
-}
-
-void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg){
-  for(const auto& status: msg.status){
-    if(status.message == "Component status") {
-      for(const auto& value: status.values){
-        if (value.value == "OK") {
-          auto rm_predicate_str = "(c_status " + value.key + " error_string)";
-          auto rm_predicate = parser::pddl::fromStringPredicate(rm_predicate_str);
-          if(problem_expert_->existPredicate(rm_predicate)) {
-            problem_expert_->removePredicate(rm_predicate);
+  void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg)
+  {
+    std::vector<plansys2::Predicate> new_predicates;
+    std::map<std::string, plansys2::Predicate> qa_predicates;
+    for (const auto &status : msg.status)
+    {
+      if (status.message == "Component status")
+      {
+        for (const auto &value : status.values)
+        {
+          std::string pred_str = "(c_status " + value.key + " error_string)";
+          auto predicate = parser::pddl::fromStringPredicate(pred_str);
+          if (value.value == "OK")
+          {
+            if (problem_expert_->existPredicate(predicate))
+            {
+              problem_expert_->removePredicate(predicate);
+            }
           }
-        } else if (value.value == "ERROR") {
-          auto add_predicate_str = "(c_status " + value.key + " error_string)";
-          problem_expert_->addPredicate(parser::pddl::fromStringPredicate(add_predicate_str));
+          else if (value.value == "ERROR")
+          {
+            new_predicates.push_back(predicate);
+          }
+        }
+      }
+      if (status.message == "QA status")
+      {
+        for (const auto &value : status.values)
+        {
+          std::ostringstream oss;
+          oss << std::fixed << std::setprecision(2) << std::stod(value.value);
+          std::string value_two_decimals = oss.str();
+          auto new_preds = add_symbolic_number(value_two_decimals);
+          new_predicates.insert(new_predicates.end(), new_preds.begin(), new_preds.end());
+          auto pred_str = "(qa_has_value obs_" + value.key + " " + value_two_decimals + "_decimal)";
+          qa_predicates[value.key] = parser::pddl::fromStringPredicate(pred_str);
         }
       }
     }
 
-    if(status.message == "QA status") {
-      for(const auto& value : status.values){
-        auto predicates = problem_expert_->getPredicates();
-        for (const auto& predicate : predicates) {
-          if (predicate.name == "qa_has_value" && predicate.parameters[0].name =="obs_" + value.key){
-            problem_expert_->removePredicate(predicate);
+    // Build a lookup for relevant QA keys
+    const std::vector<std::pair<std::string, std::string>> qa_keys = {
+        {"water_visibility", "obs_water_visibility"},
+        {"battery_level", "obs_battery_level"}};
+    bool had_obs_wv = false;
+    bool had_obs_bl = false;
+    auto predicates = problem_expert_->getPredicates();
+    for (const auto &predicate : predicates)
+    {
+      if (predicate.name == "qa_has_value")
+      {
+        for (const auto &[qa_key, obs_name] : qa_keys)
+        {
+          if (qa_predicates.count(qa_key) && predicate.parameters[0].name == obs_name)
+          {
+            if (qa_predicates[qa_key] != predicate)
+            {
+              problem_expert_->removePredicate(predicate);
+              new_predicates.push_back(qa_predicates[qa_key]);
+            }
+            if (obs_name == "obs_water_visibility")
+            {
+              had_obs_wv = true;
+            }
+            if (obs_name == "obs_battery_level")
+            {
+              had_obs_bl = true;
+            }
           }
         }
-
-        std::ostringstream oss;
-        oss << std::fixed << std::setprecision(2) << std::stod(value.value);
-        std::string value_two_decimals = oss.str();
-        add_symbolic_number(value_two_decimals);
-        auto add_predicate_str = "(qa_has_value obs_" + value.key + " " + value_two_decimals + "_decimal)";
-        problem_expert_->addPredicate(parser::pddl::fromStringPredicate(add_predicate_str));
+      }
+      if (had_obs_wv && had_obs_bl)
+      {
+        break;
       }
     }
-  }
-}
 
-void SuavePlansysController::add_symbolic_number(std::string number_str)
-{
-  float number_float = std::stof(number_str);
-  std::string number_decimal = number_str + "_decimal";
+    if (!had_obs_wv && qa_predicates.count("water_visibility"))
+    {
+      new_predicates.push_back(qa_predicates["water_visibility"]);
+    }
 
-  problem_expert_->addInstance(parser::pddl::fromStringParam(
-    number_decimal, "numerical-object"));
+    if (!had_obs_bl && qa_predicates.count("battery_level"))
+    {
+      new_predicates.push_back(qa_predicates["battery_level"]);
+    }
 
-  if (number_float < 0.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 0.25_decimal)"));
-  } else if (number_float < 0.5) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 0.5_decimal)"));
-  } else if (number_float < 0.75) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 0.75_decimal)"));
-  } else if (number_float < 1.0) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 1.0_decimal)"));
-  } else if (number_float < 1.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 1.25_decimal)"));
-  } else if (number_float < 2.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 2.25_decimal)"));
-  } else if (number_float < 3.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan " + number_decimal + " 3.25_decimal)"));
+    if (!new_predicates.empty())
+    {
+      problem_expert_->addPredicates(new_predicates);
+    }
   }
 
-  if (number_float > 0.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 0.25_decimal " + number_decimal + ")"));
-  } else if (number_float > 0.5) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 0.5_decimal " + number_decimal + ")"));
-  } else if (number_float > 0.75) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 0.75_decimal " + number_decimal + ")"));
-  } else if (number_float > 1.0) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 1.0_decimal " + number_decimal + ")"));
-  } else if (number_float > 1.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 1.25_decimal " + number_decimal + ")"));
-  } else if (number_float > 2.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 2.25_decimal " + number_decimal + ")"));
-  } else if (number_float > 3.25) {
-    problem_expert_->addPredicate(parser::pddl::fromStringPredicate(
-      "(lessthan 3.25_decimal " + number_decimal + ")"));
-  }
-}
+  std::vector<plansys2::Predicate> SuavePlansysController::add_symbolic_number(const std::string &number_str)
+  {
+    std::vector<plansys2::Predicate> new_predicates;
+    if (!numbers_added_.insert(number_str).second)
+    {
+      return new_predicates;
+    }
+    numbers_added_.insert(number_str);
 
-SuavePlansysController::~SuavePlansysController()
-{
-}
+    float number_float = std::stof(number_str);
+    std::string number_decimal = number_str + "_decimal";
 
-bool SuavePlansysController::execute_plan(){
-  // Compute the plan
-  auto domain = domain_expert_->getDomain();
-  auto problem = problem_expert_->getProblem();
-  auto plan = planner_client_->getPlan(domain, problem);
+    problem_expert_->addInstance(parser::pddl::fromStringParam(
+        number_decimal, "numerical-object"));
 
-  if (!plan.has_value()) {
-    // for (auto instance: problem_expert_->getInstances()){
-    //   std::string instance_info = "Instance " + instance.name + " type " + instance.type;
-    //   RCLCPP_INFO(get_logger(), "%s", instance_info.c_str());
-    // }
-    // for (auto predicate: problem_expert_->getPredicates()) {
-    //   std::string predicate_str = parser::pddl::toString(predicate);
-    //   RCLCPP_INFO(get_logger(), "Predicate: %s", predicate_str.c_str());
-    // }
+    static const std::vector<std::pair<float, std::string>> thresholds = {
+        {0.25f, "0.25_decimal"}, {0.5f, "0.5_decimal"}, {0.75f, "0.75_decimal"}, {1.0f, "1.0_decimal"}, {1.25f, "1.25_decimal"}, {2.25f, "2.25_decimal"}, {3.25f, "3.25_decimal"}};
 
-    std::string goal_str = "Could not find plan to reach goal " + parser::pddl::toString(problem_expert_->getGoal());
-    RCLCPP_INFO(get_logger(), "%s", goal_str.c_str());
-    return false;
+    // Less than checks
+    for (const auto &[t, t_str] : thresholds)
+    {
+      if (number_float < t)
+      {
+        new_predicates.push_back(parser::pddl::fromStringPredicate(
+            "(lessthan " + number_decimal + " " + t_str + ")"));
+      }
+    }
+    // Greater than checks
+    for (const auto &[t, t_str] : thresholds)
+    {
+      if (number_float > t)
+      {
+        new_predicates.push_back(parser::pddl::fromStringPredicate(
+            "(lessthan " + t_str + " " + number_decimal + ")"));
+      }
+    }
+    return new_predicates;
   }
 
-  RCLCPP_INFO(get_logger(), "Selected plan: ");
-  for (auto item : plan->items){
-    RCLCPP_INFO(get_logger(), "  Action: '%s'", item.action.c_str());
-  }
-  // Execute the plan
-  return executor_client_->start_plan_execution(plan.value());
-}
-
-void SuavePlansysController::finish_controlling(){
-  step_timer_->cancel();
-  executor_client_->cancel_plan_execution();
-  request_save_mission_results();
-  time_limit_timer_->cancel();
-}
-
-void SuavePlansysController::step(){
-  if (first_iteration_){
-    first_iteration_ = !execute_plan();
-    return;
+  SuavePlansysController::~SuavePlansysController()
+  {
   }
 
-  if (!executor_client_->execute_and_check_plan() && executor_client_->getResult()) {
-    if (executor_client_->getResult().value().success) {
-      RCLCPP_INFO(get_logger(), "Plan execution finished with success!");
-      finish_controlling();
-    } else {
-      RCLCPP_INFO(get_logger(), "Replanning!");
-      execute_plan();
+  bool SuavePlansysController::execute_plan()
+  {
+    // Compute the plan
+    auto domain = domain_expert_->getDomain();
+    auto problem = problem_expert_->getProblem();
+    auto plan = planner_client_->getPlan(domain, problem);
+
+    if (!plan.has_value())
+    {
+      // for (auto instance: problem_expert_->getInstances()){
+      //   std::string instance_info = "Instance " + instance.name + " type " + instance.type;
+      //   RCLCPP_INFO(get_logger(), "%s", instance_info.c_str());
+      // }
+      // for (auto predicate: problem_expert_->getPredicates()) {
+      //   std::string predicate_str = parser::pddl::toString(predicate);
+      //   RCLCPP_INFO(get_logger(), "Predicate: %s", predicate_str.c_str());
+      // }
+
+      std::string goal_str = "Could not find plan to reach goal " + parser::pddl::toString(problem_expert_->getGoal());
+      RCLCPP_INFO(get_logger(), "%s", goal_str.c_str());
+      return false;
+    }
+
+    RCLCPP_INFO(get_logger(), "Selected plan: ");
+    for (auto item : plan->items)
+    {
+      RCLCPP_INFO(get_logger(), "  Action: '%s'", item.action.c_str());
+    }
+    // Execute the plan
+    return executor_client_->start_plan_execution(plan.value());
+  }
+
+  void SuavePlansysController::finish_controlling()
+  {
+    step_timer_->cancel();
+    executor_client_->cancel_plan_execution();
+    request_save_mission_results();
+    time_limit_timer_->cancel();
+  }
+
+  void SuavePlansysController::step()
+  {
+    if (first_iteration_)
+    {
+      first_iteration_ = !execute_plan();
       return;
     }
-  }
-}
 
-void SuavePlansysController::time_limit_cb(){
+    if (!executor_client_->execute_and_check_plan() && executor_client_->getResult())
+    {
+      if (executor_client_->getResult().value().success)
+      {
+        RCLCPP_INFO(get_logger(), "Plan execution finished with success!");
+        finish_controlling();
+      }
+      else
+      {
+        RCLCPP_INFO(get_logger(), "Replanning!");
+        execute_plan();
+        return;
+      }
+    }
+  }
+
+  void SuavePlansysController::time_limit_cb()
+  {
     _time_limit = get_parameter("time_limit").as_int();
-    if(_search_started && (get_clock()->now() - _start_time) >= rclcpp::Duration(_time_limit, 0)){
+    if (_search_started && (get_clock()->now() - _start_time) >= rclcpp::Duration(_time_limit, 0))
+    {
       RCLCPP_INFO(get_logger(), "Time limit reached!");
       finish_controlling();
     }
-}
+  }
 
-bool SuavePlansysController::request_save_mission_results(){
-  while (!save_mission_results_cli->wait_for_service(1s)) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(get_logger(), "Interrupted while waiting for the service. Exiting.");
+  bool SuavePlansysController::request_save_mission_results()
+  {
+    while (!save_mission_results_cli->wait_for_service(1s))
+    {
+      if (!rclcpp::ok())
+      {
+        RCLCPP_ERROR(get_logger(), "Interrupted while waiting for the service. Exiting.");
+        return false;
+      }
+      RCLCPP_INFO(get_logger(), "mission_metrics/save service not available, waiting again...");
+    }
+
+    auto request = std::make_shared<std_srvs::srv::Empty::Request>();
+    auto response = save_mission_results_cli->async_send_request(request);
+    if (response.wait_for(1s) != std::future_status::ready)
+    {
+      RCLCPP_ERROR(get_logger(), "Failed to call service mission_metrics/save");
       return false;
     }
-    RCLCPP_INFO(get_logger(), "mission_metrics/save service not available, waiting again...");
+    return true;
   }
 
-  auto request = std::make_shared<std_srvs::srv::Empty::Request>();
-  auto response = save_mission_results_cli->async_send_request(request);
-  if (response.wait_for(1s) != std::future_status::ready)
+  void SuavePlansysController::search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg)
   {
-    RCLCPP_ERROR(get_logger(), "Failed to call service mission_metrics/save");
-    return false;
+    if (msg.goal_state.id == 3)
+    {
+      _start_time = get_clock()->now();
+      _search_started = true;
+    }
   }
-  return true;
-}
 
-void SuavePlansysController::search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg){
-  if(msg.goal_state.id == 3){
-    _start_time = get_clock()->now();
-    _search_started = true;
-  }
-}
+} // namespace
 
-}  // namespace
-
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<suave_planta::SuavePlansysController>(
-    "mission_node");
+      "mission_node");
 
   node->init();
 

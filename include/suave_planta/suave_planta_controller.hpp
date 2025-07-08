@@ -19,7 +19,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "diagnostic_msgs/msg/diagnostic_array.hpp"
 #include "std_msgs/msg/string.hpp"
-
+#include "mavros_msgs/msg/state.hpp"
 #include "plansys2_domain_expert/DomainExpertClient.hpp"
 #include "plansys2_executor/ExecutorClient.hpp"
 #include "plansys2_planner/PlannerClient.hpp"
@@ -51,12 +51,15 @@ protected:
   bool first_iteration_ = true;
   bool execute_plan();
 
-  rclcpp::Time _start_time;
-  bool _search_started = false;
-  int _time_limit;
+  rclcpp::Time start_time_;
+  int time_limit_;
   rclcpp::Client<std_srvs::srv::Empty>::SharedPtr save_mission_results_cli;
 
-  rclcpp::Subscription<lifecycle_msgs::msg::TransitionEvent>::SharedPtr search_pipeline_transition_sub_;
+  bool guided_mode_ = false;
+  rclcpp::Subscription<mavros_msgs::msg::State>::SharedPtr mavros_state_sub_;
+  rclcpp::CallbackGroup::SharedPtr mavros_state_sub_cb_group_;
+
+  bool battery_charged_= true;
   rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagnostics_sub_;
   rclcpp::CallbackGroup::SharedPtr diagnostics_sub_cb_group_;
 
@@ -67,12 +70,12 @@ protected:
 
   rclcpp::CallbackGroup::SharedPtr time_limit_timer_cb_group_;
   rclcpp::TimerBase::SharedPtr time_limit_timer_;
-
+  
   void step();
   void finish_controlling();
   void time_limit_cb();
   bool request_save_mission_results();
-  void search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg);
+  void mavros_state_cb(const mavros_msgs::msg::State &msg);
 };
 
 }  // namespace suave_planta

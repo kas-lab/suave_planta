@@ -26,7 +26,7 @@ namespace suave_planta
 {
 
   SuavePlansysController::SuavePlansysController(const std::string &node_name)
-      : Node(node_name), _time_limit(300)
+      : Node(node_name), time_limit_(300)
   {
   }
 
@@ -40,15 +40,19 @@ namespace suave_planta
     step_timer_cb_group_ = this->create_callback_group(
         rclcpp::CallbackGroupType::MutuallyExclusive);
     step_timer_ = this->create_wall_timer(
-        500ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
+        100ms, std::bind(&SuavePlansysController::step, this), step_timer_cb_group_);
 
     save_mission_results_cli =
         this->create_client<std_srvs::srv::Empty>("mission_metrics/save");
-
-    search_pipeline_transition_sub_ = this->create_subscription<lifecycle_msgs::msg::TransitionEvent>(
-        "/f_generate_search_path_node/transition_event",
+    
+    mavros_state_sub_cb_group_ = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+    rclcpp::SubscriptionOptions mavros_state_sub_options;
+    mavros_state_sub_options.callback_group = mavros_state_sub_cb_group_;
+    mavros_state_sub_ = this->create_subscription<mavros_msgs::msg::State>(
+        "mavros/state",
         10,
-        std::bind(&SuavePlansysController::search_pipeline_transition_cb_, this, _1));
+        std::bind(&SuavePlansysController::mavros_state_cb, this, _1), mavros_state_sub_options);
 
     time_limit_timer_cb_group_ = this->create_callback_group(
         rclcpp::CallbackGroupType::MutuallyExclusive);
@@ -70,6 +74,7 @@ namespace suave_planta
   void SuavePlansysController::diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg)
   {
     std::vector<plansys2::Predicate> new_predicates;
+    std::vector<plansys2::Predicate> remove_predicates;
     std::map<std::string, plansys2::Predicate> qa_predicates;
     for (const auto &status : msg.status)
     {
@@ -83,7 +88,7 @@ namespace suave_planta
           {
             if (problem_expert_->existPredicate(predicate))
             {
-              problem_expert_->removePredicate(predicate);
+              remove_predicates.push_back(predicate);
             }
           }
           else if (value.value == "ERROR")
@@ -99,6 +104,11 @@ namespace suave_planta
           std::ostringstream oss;
           oss << std::fixed << std::setprecision(2) << std::stod(value.value);
           std::string value_two_decimals = oss.str();
+          if (value.key == "battery_level" && (std::stod(value.value) >= 0.25) == battery_charged_) {
+            continue;
+          } else if (value.key == "battery_level") {
+            battery_charged_ = (std::stod(value.value) >= 0.25);
+          }
           auto new_preds = add_symbolic_number(value_two_decimals);
           new_predicates.insert(new_predicates.end(), new_preds.begin(), new_preds.end());
           auto pred_str = "(qa_has_value obs_" + value.key + " " + value_two_decimals + "_decimal)";
@@ -124,7 +134,7 @@ namespace suave_planta
           {
             if (qa_predicates[qa_key] != predicate)
             {
-              problem_expert_->removePredicate(predicate);
+              remove_predicates.push_back(predicate);
               new_predicates.push_back(qa_predicates[qa_key]);
             }
             if (obs_name == "obs_water_visibility")
@@ -154,9 +164,9 @@ namespace suave_planta
       new_predicates.push_back(qa_predicates["battery_level"]);
     }
 
-    if (!new_predicates.empty())
+    if (!new_predicates.empty() || !remove_predicates.empty())
     {
-      problem_expert_->addPredicates(new_predicates);
+      problem_expert_->updatePredicates(new_predicates, remove_predicates);
     }
   }
 
@@ -269,8 +279,8 @@ namespace suave_planta
 
   void SuavePlansysController::time_limit_cb()
   {
-    _time_limit = get_parameter("time_limit").as_int();
-    if (_search_started && (get_clock()->now() - _start_time) >= rclcpp::Duration(_time_limit, 0))
+    time_limit_ = get_parameter("time_limit").as_int();
+    if (guided_mode_ && (get_clock()->now() - start_time_) >= rclcpp::Duration(time_limit_, 0))
     {
       RCLCPP_INFO(get_logger(), "Time limit reached!");
       finish_controlling();
@@ -299,12 +309,12 @@ namespace suave_planta
     return true;
   }
 
-  void SuavePlansysController::search_pipeline_transition_cb_(const lifecycle_msgs::msg::TransitionEvent &msg)
+  void SuavePlansysController::mavros_state_cb(const mavros_msgs::msg::State &msg) 
   {
-    if (msg.goal_state.id == 3)
+    if (msg.mode == "GUIDED")
     {
-      _start_time = get_clock()->now();
-      _search_started = true;
+      start_time_ = get_clock()->now();
+      guided_mode_ = true;
     }
   }
 

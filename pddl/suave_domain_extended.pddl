@@ -15,6 +15,7 @@
   )
 
   (:constants
+    bluerov - robot
     0.25_decimal 1.0_decimal - numerical-object 
   )
   
@@ -25,11 +26,12 @@
     (robot_started ?r - robot)
     (robot_not_started ?r - robot)
 
-    (inferred-battery_charged ?r)
+    (inferred-battery_charged ?r - robot)
   )
 
-  (:derived (inferred-battery_charged ?r)
+  (:derived (inferred-battery_charged ?r - robot)
     (and
+	    (= ?r bluerov)
       (exists (?mqa ?mqav) 
         (and
           (= ?mqa obs_battery_level)
@@ -39,8 +41,8 @@
         )
       )
     )
-  ) 
-  
+  )
+
   (:action start_robot
     :parameters (?r - robot)
     :precondition (and

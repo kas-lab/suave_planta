@@ -3,7 +3,6 @@
 
   (:objects
     pipeline - pipeline
-    bluerov - robot
   )
 
   (:init

@@ -311,7 +311,7 @@ namespace suave_planta
 
   void SuavePlansysController::mavros_state_cb(const mavros_msgs::msg::State &msg) 
   {
-    if (msg.mode == "GUIDED")
+    if (msg.mode == "GUIDED" && !guided_mode_)
     {
       start_time_ = get_clock()->now();
       guided_mode_ = true;

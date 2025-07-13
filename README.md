@@ -1,5 +1,8 @@
 # suave_planta
 
+[![DOI](https://zenodo.org/badge/842123765.svg)](https://doi.org/10.5281/zenodo.15874043)
+
+
 A PDDL-based managing system for SUAVE.
 
 This repo contains the experimental setup used in the paper "Plan your Self-Adaptation! – Efficient Task and Architecture Co-adaptation Planning for Robots".

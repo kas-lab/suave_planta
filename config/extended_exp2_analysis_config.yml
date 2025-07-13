@@ -1,0 +1,21 @@
+/analysis:
+  ros__parameters:
+    result_path: '~/suave_ws/src/suave_planta/results/suave_extended/exp2'
+    filename: 'suave_analysis'
+    data_files: # List of data_file to analyze
+      - |
+        {
+          "managing_system": "bt",
+          "data_file": "~/suave_ws/src/suave_planta/results/suave_extended/exp2/bt_suave_extended.csv"
+        }
+      - |
+        {
+          "managing_system": "rosa",
+          "data_file": "~/suave_ws/src/suave_planta/results/suave_extended/exp2/rosa_bt_suave_extended.csv"
+        }
+      - |
+        {
+          "managing_system": "planta",
+          "data_file": "~/suave_ws/src/suave_planta/results/suave_extended/exp2/planta_suave_extended.csv"
+        }
+

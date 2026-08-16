@@ -34,7 +34,7 @@ RUN ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash \
 RUN mkdir -p $HOME/suave/results
 COPY --chown=ubuntu-user:ubuntu-user entrypoint.sh $HOME/suave_ws/entrypoint.sh
 
-ENV PATH=$HOME/suave_ws/src/dlToPlanning:$PATH
+ENV PATH=$HOME/suave_ws/src/owl_to_pddl:$PATH
 
 RUN sudo apt autoremove -y && sudo rm -rf /var/lib/apt/lists/
 ENTRYPOINT ["/home/ubuntu-user/suave_ws/entrypoint.sh"]

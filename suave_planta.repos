@@ -2,12 +2,12 @@ repositories:
   plansys2:
     type: git
     url: https://github.com/Rezenders/ros2_planning_system.git
-    version: new_evaluation  
-  dlToPlanning:
+    version: new_evaluation
+  owl_to_pddl:
     type: git
     url: https://github.com/remaro-network/dlToPlanning.git
     version: main
   downward_ros:
     type: git
     url: https://github.com/kas-lab/downward_ros.git
-    version: main 
+    version: main

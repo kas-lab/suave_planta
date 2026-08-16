@@ -11,7 +11,13 @@ The remainder of this README explains how to reproduce the experiments.
 
 ## Docker
 
-The first step is to run the `suave_planta` docker image.
+The first step is to build the `suave_planta` docker image, if you want to have it locally:
+
+```Bash
+docker build -t suave_planta .
+```
+
+Run docker image:
 
 Run docker image without web interface (with nvidia)(don't forget to install the [docker-nvidia-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html))
 
@@ -40,6 +46,15 @@ Mount `$HOME/suave/results`, `$HOME/suave_ws/src/suave`, `$HOME/suave_ws/src/sua
 ```Bash
 docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave/results:/home/ubuntu-user/suave/results -v $HOME/suave_ws/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $HOME/suave_ws/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 -v $HOME/suave_ws/src/suave:/home/ubuntu-user/suave_ws/src/suave suave_planta
 ```
+
+```Bash
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave/results:/home/ubuntu-user/suave/results -v $PWD/src/suave_planta:/home/ubuntu-user/suave_ws/src/suave_planta -v $PWD/src/ros2_planning_system:/home/ubuntu-user/suave_ws/src/plansys2 -v $PWD/src/suave:/home/ubuntu-user/suave_ws/src/suave suave_planta
+```
+
+```Bash
+docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$DISPLAY -e QT_X11_NO_MITSHM=1 -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -v /dev/dri:/dev/dri -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro -v $HOME/suave/results:/home/ubuntu-user/suave/results -v $PWD:/home/ubuntu-user/suave_ws/src/suave_planta suave_planta
+```
+
 
 ## Run SUAVE with PLANTA
 
@@ -198,7 +213,7 @@ ros2 launch suave_planta extended_exp3_analysis.launch.py
 
 ## OWL to PDDL
 
-If you want to try the OWL to PDDL conversion separetly, check the examples below.
+If you want to try the OWL to PDDL conversion separately, check the examples below.
 
 With ROS:
 ```bash
@@ -212,12 +227,12 @@ ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave_extended.o
 
 Without ROS:
 ```bash
-OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outDomain=pddl/suave_domain_test.pddl --aBox --inProblem=pddl/suave_problem.pddl --outProblem=pddl/suave_problem_test.pddl --add-num-comparisons --replace-output
+OWLToPDDL.sh --owl=owl/suave.owl --tBox --inDomain=pddl/suave_domain.pddl --outDomain=pddl/suave_domain_created.pddl --aBox --inProblem=pddl/suave_problem.pddl --outProblem=pddl/suave_problem_created.pddl --add-num-comparisons --replace-output
 ```
 
 SUAVE extended
 ```bash
-OWLToPDDL.sh --owl=owl/suave_extended.owl --tBox --inDomain=pddl/suave_domain_extended.pddl --outDomain=pddl/suave_domain_extended_test.pddl --aBox --inProblem=pddl/suave_problem_extended.pddl --outProblem=pddl/suave_problem_extended_test.pddl --add-num-comparisons --replace-output
+OWLToPDDL.sh --owl=owl/suave_extended.owl --tBox --inDomain=pddl/suave_domain_extended.pddl --outDomain=pddl/suave_domain_extended_created.pddl --aBox --inProblem=pddl/suave_problem_extended.pddl --outProblem=pddl/suave_problem_extended_created.pddl --add-num-comparisons --replace-output
 ```
 
 ## Planning with fast downward

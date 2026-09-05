@@ -34,9 +34,8 @@
         }
       - |
         {
-          "experiment_launch": "ros2 launch suave_bt suave_bt_extended.launch.py",
+          "experiment_launch": "ros2 launch suave_bringup mission.launch.py adaptation_manager:=bt bt_executable:=suave_bt_extended",
           "num_runs": 30,
           "adaptation_manager": "bt",
           "mission_name": "suave_extended"
         }
-

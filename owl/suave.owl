@@ -38,30 +38,12 @@
     
 
 
-    <!-- http://www.metacontrol.org/suave#a_recharge_battery -->
-
-    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#a_recharge_battery">
-        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Action"/>
-        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
-        <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#generate_recharge_path"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.metacontrol.org/suave#a_search_pipeline -->
 
     <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#a_search_pipeline">
         <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Action"/>
         <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
         <tomasys:requiresF rdf:resource="http://www.metacontrol.org/suave#f_maintain_motion"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.metacontrol.org/suave#battery_level -->
-
-    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#battery_level">
-        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QualityAttributeType"/>
     </owl:NamedIndividual>
     
 
@@ -203,23 +185,6 @@
         <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_search_efficiency_medium"/>
         <tomasys:hasQAestimation rdf:resource="http://www.metacontrol.org/suave#qa_water_visibility_medium"/>
         <tomasys:solvesF rdf:resource="http://www.metacontrol.org/suave#f_generate_search_path"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.metacontrol.org/suave#generate_recharge_path -->
-
-    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#generate_recharge_path">
-        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.metacontrol.org/suave#obs_battery_level -->
-
-    <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#obs_battery_level">
-        <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#QAvalue"/>
-        <tomasys:isQAtype rdf:resource="http://www.metacontrol.org/suave#battery_level"/>
     </owl:NamedIndividual>
     
 

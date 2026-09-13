@@ -366,12 +366,12 @@ If you want to try the OWL to PDDL conversion separately, check the examples bel
 
 With ROS:
 ```bash
-ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave.owl -p in_domain_file:=pddl/suave_domain.pddl -p out_domain_file:=pddl/suave_domain_created.pddl -p in_problem_file:=pddl/suave_problem.pddl -p out_problem_file:=pddl/suave_problem_created.pddl
+ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave.owl -p in_domain_file:=pddl/suave_domain.pddl -p out_domain_file:=pddl/suave_domain_created.pddl -p in_problem_file:=pddl/suave_problem.pddl -p out_problem_file:=pddl/suave_problem_created.pddl -p add_numbers:=true -p replace_output:=true
 ```
 
 SUAVE extended
 ```bash
-ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave_extended.owl -p in_domain_file:=pddl/suave_domain_extended.pddl -p out_domain_file:=pddl/suave_domain_extended_created.pddl -p in_problem_file:=pddl/suave_problem_extended.pddl -p out_problem_file:=pddl/suave_problem_extended_created.pddl
+ros2 run owl_to_pddl owl_to_pddl.py --ros-args -p owl_file:=owl/suave_extended.owl -p in_domain_file:=pddl/suave_domain_extended.pddl -p out_domain_file:=pddl/suave_domain_extended_created.pddl -p in_problem_file:=pddl/suave_problem_extended.pddl -p out_problem_file:=pddl/suave_problem_extended_created.pddl -p add_numbers:=true -p replace_output:=true
 ```
 
 Without ROS:
@@ -395,4 +395,14 @@ ros2 run downward_ros fast-downward.py pddl/suave_domain_created.pddl pddl/suave
 SUAVE extended:
 ```bash
 ros2 run downward_ros fast-downward.py pddl/suave_domain_extended_created.pddl pddl/suave_problem_extended_created.pddl --search 'astar(blind())'
+```
+
+## Count PDDL complexity
+
+```bash
+ros2 run owl_to_pddl count_pddl_complexity.py pddl/suave_domain_created.pddl pddl/suave_problem_created.pddl
+```
+
+```bash
+ros2 run owl_to_pddl count_pddl_complexity.py pddl/suave_domain_extended_created.pddl pddl/suave_problem_extended_created.pddl
 ```

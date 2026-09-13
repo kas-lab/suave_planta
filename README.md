@@ -58,7 +58,39 @@ docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$
 
 ## Run SUAVE with PLANTA
 
-### With Runner
+### Batch runner
+
+To run all six experiment campaigns (`exp1`-`exp3` and `extended_exp1`-`extended_exp3`) sequentially in one go, use the generic `run_batch` node from `suave_runner`, configured through [batch_campaigns.yml](config/runner/batch_campaigns.yml):
+
+```Bash
+ros2 launch suave_planta run_batch.launch.py
+```
+
+**Note:** running all six campaigns back-to-back takes several hours to a few days, depending on the machine and `num_runs` per experiment — plan to leave it running unattended (e.g. in `screen`/`tmux`) rather than waiting on it.
+
+This creates a timestamped batch directory under `~/suave/results/batches/` (e.g. `batch_20260913_104200/`) containing:
+- `state.json` — the batch checkpoint, tracking each campaign's status (`pending`, `running`, `completed`, `incomplete`, `failed`, or `interrupted`)
+- `run_batch.log` — the overall orchestration log
+- `<campaign_name>.log` — combined stdout/stderr for each campaign (e.g. `exp1.log`)
+- `campaigns/<campaign_name>/` — each campaign's own results directory, in the same layout `suave_runner` produces for a single campaign
+
+**Checking whether a batch needs to be resumed:** a batch finished cleanly if `run_batch.log` ends with `All campaigns completed successfully.`. If it stops early — Ctrl+C, a crash, a failed campaign — the log ends instead with a `Batch interrupted; ...` or `Batch finished with N incomplete, ...` line followed by the exact resume command to use. You can also check campaign-by-campaign at any time by inspecting `state.json`:
+
+```Bash
+grep '"status"' ~/suave/results/batches/<batch_dir>/state.json
+```
+
+Any campaign not marked `"status": "completed"` still needs to (re)run.
+
+**Resuming an interrupted batch:** pass the batch's `state.json` as the `resume_state_file` parameter; campaigns already marked `completed` are skipped, and an `incomplete` campaign picks up from its last saved run instead of starting over:
+
+```Bash
+ros2 run suave_runner run_batch --ros-args -p resume_state_file:=~/suave/results/batches/<batch_dir>/state.json
+```
+
+**Note:** to run a custom subset or order of campaigns, edit [batch_campaigns.yml](config/runner/batch_campaigns.yml) (or point `run_batch` at your own copy via `--params-file`) before starting a new batch. `-p fail_fast:=true` stops the batch as soon as a campaign fails instead of continuing to the next one, and `-p dry_run:=true` prints the `ros2 run` command for each campaign without executing anything.
+
+### With Individual Runner
 
 #### SUAVE
 You can run it with the launchfile:
@@ -258,6 +290,15 @@ across both metrics within that experiment. Use `p_adjusted` in
 matrices and the node's console significance labels use raw p-values.
 
 
+### Batch analysis and LaTeX tables
+
+`run_batch.launch.py` writes a batch root containing `state.json` and
+`campaigns/<experiment>/`. By default it creates
+`~/suave/results/batches/batch_YYYYMMDD_HHMMSS` and prints the exact batch
+directory. Pass that same root to the new analysis launch:
+
+```bash
+ros2 launch suave_planta run_batch.launch.py
 # After the run finishes, use the batch directory printed by the runner:
 ros2 launch suave_planta batch_analysis.launch.py \
   batch_dir:=/home/ubuntu-user/suave/results/batches/batch_YYYYMMDD_HHMMSS

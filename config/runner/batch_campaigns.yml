@@ -1,0 +1,50 @@
+# Batch config for suave_runner's generic `run_batch` entry point.
+# Lists the six suave_planta experiment campaigns in run order.
+#
+#   ros2 run suave_runner run_batch --ros-args --params-file \
+#     $(ros2 pkg prefix suave_planta)/share/suave_planta/config/runner/batch_campaigns.yml
+#
+# Resume an interrupted batch instead of restarting it:
+#
+#   ros2 run suave_runner run_batch --ros-args \
+#     -p resume_state_file:=<batch_dir>/state.json
+
+/run_batch_node:
+  ros__parameters:
+    campaigns:
+      - |
+        {
+          "name": "exp1",
+          "package": "suave_planta",
+          "config_file": "config/runner/exp1_runner_config.yml"
+        }
+      - |
+        {
+          "name": "exp2",
+          "package": "suave_planta",
+          "config_file": "config/runner/exp2_runner_config.yml"
+        }
+      - |
+        {
+          "name": "exp3",
+          "package": "suave_planta",
+          "config_file": "config/runner/exp3_runner_config.yml"
+        }
+      - |
+        {
+          "name": "extended_exp1",
+          "package": "suave_planta",
+          "config_file": "config/runner/extended_exp1_runner_config.yml"
+        }
+      - |
+        {
+          "name": "extended_exp2",
+          "package": "suave_planta",
+          "config_file": "config/runner/extended_exp2_runner_config.yml"
+        }
+      - |
+        {
+          "name": "extended_exp3",
+          "package": "suave_planta",
+          "config_file": "config/runner/extended_exp3_runner_config.yml"
+        }

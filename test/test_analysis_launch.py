@@ -117,3 +117,15 @@ def test_batch_launch_reports_wrong_directory(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError, match='exit code 1'):
         module._check_exit(SimpleNamespace(returncode=1), context)
     assert module._check_exit(SimpleNamespace(returncode=0), context) == []
+
+
+def test_runner_forwards_batch_directory(tmp_path, monkeypatch):
+    """Allow the runner and analysis launches to use the same chosen path."""
+    module = _load('runner/run_batch.launch.py', monkeypatch)
+    description = module.generate_launch_description()
+    context = _context(description, {'batch_dir': str(tmp_path)})
+    node = next(action for action in description.entities
+                if isinstance(action, Node))
+    params = evaluate_parameters(context, node._Node__parameters)[1]
+    assert params['batch_dir'] == str(tmp_path)
+    assert params['resume_state_file'] == ''

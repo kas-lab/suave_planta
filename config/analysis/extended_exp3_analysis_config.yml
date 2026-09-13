@@ -1,0 +1,22 @@
+# Paths are resolved by the launch file through launch substitutions.
+/wilcoxon_analysis:
+  ros__parameters:
+    result_path: '$(var output_root)/suave_extended/exp3'
+    filename: 'extended_exp3_wilcoxon'
+    correction: '$(var correction)'
+    data_files:
+      - |
+        {
+          "managing_system": "bt",
+          "data_file": "$(var results_root)/suave_extended/exp3/bt_suave_extended_sorted.csv"
+        }
+      - |
+        {
+          "managing_system": "rosa_bt",
+          "data_file": "$(var results_root)/suave_extended/exp3/rosa_bt_suave_extended_sorted.csv"
+        }
+      - |
+        {
+          "managing_system": "planta",
+          "data_file": "$(var results_root)/suave_extended/exp3/planta_suave_extended_sorted.csv"
+        }

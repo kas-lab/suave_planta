@@ -56,3 +56,23 @@ y = -2 + random(+1,1)
     thruster_events: 
     - (1,failure,35) 
     - (3,failure,35) # change time between every 5 runs
+
+## Analysis implementation locations
+
+The configs in `analysis/` select the bundled `*_sorted.csv` files under
+`results/suave/expN/` and `results/suave_extended/expN/`. Their node namespace
+is `/wilcoxon_analysis`, and their matching launches run the installed
+`suave_runner` paired Wilcoxon executable with Holm correction by default.
+
+Paths use `$(var results_root)` and `$(var output_root)`, expanded by
+`ParameterFile(..., allow_substs=True)` in the launch files. Use the matching
+launch rather than passing these YAML files directly to `ros2 run`.
+
+For new runner batches, use `batch_analysis.launch.py batch_dir:=<batch_root>`.
+It consumes the `state.json` and `campaigns/` structure produced by
+`run_batch.launch.py`, sorting raw CSVs before analysis. The batch's original
+runner configs establish the completion-marker indices; these single-run
+analysis configs are not used by batch analysis.
+
+See the [analysis guide](../README.md#run-the-experimental-analysis) for
+launch arguments and rebuild commands.

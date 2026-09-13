@@ -101,7 +101,7 @@ ros2 launch suave_planta extended_exp3_suave_runner.launch.py
 
 ### Custom runner config
 
-**Changing experiments config:** Simply create a new configuration file for the runner, for example by modifying the [exp3_runner_config.yml](config/exp3_runner_config.yml) file. Then, pass it to the `suave_runner`node, for example, by modifying the [exp3_suave_runner.launch.py](config/exp3_suave_runner.launch.py) launch file.
+**Changing experiments config:** Simply create a new configuration file for the runner, for example by modifying the [exp3_runner_config.yml](config/runner/exp3_runner_config.yml) file. Then, pass it to the `suave_runner`node, for example, by modifying the [exp3_suave_runner.launch.py](launch/runner/exp3_suave_runner.launch.py) launch file.
 
 Alternatively, you can run the `suave_runner` node directly with the parameters you want. Check some examples below:
 
@@ -113,7 +113,7 @@ ros2 run suave_runner suave_runner \
   -p experiment_logging:=True \
   -p experiments:='[
     "{\"experiment_launch\": \"ros2 launch suave_planta suave_planta.launch.py\", \
-      \"num_runs\": 20, \
+      \"num_runs\": 1, \
       \"adaptation_manager\": \"planta\", \
       \"mission_name\": \"suave\"}"
   ]'
@@ -166,7 +166,22 @@ ros2 launch suave_planta suave_planta.launch.py
 
 ## Run the experimental analysis
 
-To reproduce exactly the analysis done for the paper, run the commands below.
+The launches below analyze the bundled, run-matched `*_sorted.csv` files
+using the paired Wilcoxon signed-rank test with Holm correction. Standard
+SUAVE inputs are in `results/suave/exp1`, `exp2`, and `exp3`; extended inputs
+are in the corresponding `results/suave_extended/` folders. These launches
+replace the old Mann-Whitney configurations that referenced raw CSVs no
+longer present in `results/`.
+
+Paths are resolved from the installed `suave_planta` package rather than a
+particular user's home or workspace path. With a symlink installation,
+the input files point back to the source package's bundled results. Rebuild
+after updating the launch/config files and result files:
+
+```bash
+colcon build --symlink-install --packages-select suave_runner suave_planta
+source install/setup.bash
+```
 
 ### SUAVE
 
@@ -185,7 +200,16 @@ Experiment 3:
 ros2 launch suave_planta exp3_analysis.launch.py
 ```
 
-**Note:** the results are saved in the results folder in this package
+Outputs are written beside the inputs by default, using the prefix
+`expN_wilcoxon` (or `extended_expN_wilcoxon`). To keep the bundled outputs
+intact, supply a separate output root, for example:
+
+```bash
+ros2 launch suave_planta exp1_analysis.launch.py output_root:=/tmp/planta_analysis
+```
+
+This writes under `/tmp/planta_analysis/suave/exp1/`. The extended launch
+uses `suave_extended/expN/` under the selected root.
 
 ### SUAVE extended
 
@@ -204,12 +228,88 @@ Experiment 3:
 ros2 launch suave_planta extended_exp3_analysis.launch.py
 ```
 
-**Note:** the results are saved in the results folder in this package
+For example, save extended experiment 1 outputs to another directory:
+
+```bash
+ros2 launch suave_planta extended_exp1_analysis.launch.py \
+  output_root:=/tmp/planta_analysis
+```
 
 ### Custom analysis
 
-**Changing analysis config:** Simply create a new configuration file for the analysis node, for example by modifying the [exp3_analysis_config.yml](config/exp3_analysis_config.yml) file. Then, pass it to the `statistical_analysis` node, for example, by modifying the [exp3_analysis.launch.py](config/exp3_analysis.launch.py) launch file.
+Edit the [analysis configs](config/analysis/) to choose the sorted method
+CSV files. The YAML node namespace is `/wilcoxon_analysis`. File paths use
+`$(var results_root)` and `$(var output_root)` substitutions expanded by the
+launch files; these configs are intended to be used through the launches.
 
+Each single-experiment launch accepts:
+
+| Argument | Default | Purpose |
+|---|---|---|
+| `results_root` | Installed package's `results/` | Root containing `suave/` and `suave_extended/` |
+| `output_root` | Same as `results_root` | Root for generated CSVs in the same experiment layout |
+| `correction` | `holm` | `holm` or explicit `none` |
+
+Both metrics exclude a pair when either method did not find the pipeline.
+Search time uses the `less` alternative and distance uses `greater` for
+row method minus column method. Holm correction pools the computed tests
+across both metrics within that experiment. Use `p_adjusted` in
+`*_wilcoxon_results.csv` for corrected comparisons; the two secondary
+matrices and the node's console significance labels use raw p-values.
+
+
+# After the run finishes, use the batch directory printed by the runner:
+ros2 launch suave_planta batch_analysis.launch.py \
+  batch_dir:=/home/ubuntu-user/suave/results/batches/batch_YYYYMMDD_HHMMSS
+```
+
+Alternatively, choose an explicit directory for both commands. Run analysis
+after the batch completes:
+
+```bash
+ros2 launch suave_planta run_batch.launch.py \
+  batch_dir:=/home/ubuntu-user/suave/results/batches/my_batch
+ros2 launch suave_planta batch_analysis.launch.py \
+  batch_dir:=/home/ubuntu-user/suave/results/batches/my_batch
+```
+
+The runner requires a new directory for a fresh batch. To resume an existing
+batch, leave `batch_dir` empty and supply
+`resume_state_file:=/path/to/batch/state.json` instead.
+
+The analysis launch accepts the **batch root**, not its `campaigns/` child
+and not the bundled `suave_planta/results/` tree. It automatically sorts raw
+CSV files using their original completion markers, then runs paired Wilcoxon
+analysis. The input directory must come from a completed matching campaign;
+incomplete runs and unsafe reconstruction are reported as errors.
+
+| Batch analysis argument | Default | Purpose |
+|---|---|---|
+| `batch_dir` | Required | Exact output root of the batch runner |
+| `output_root` | `<batch_dir>/campaings_results` | Root for analysis outputs |
+| `config_dir` | Config paths recorded in `state.json` | Override with original configs if those paths moved |
+| `correction` | `holm` | Correction separately within each experiment |
+
+Results go to `<batch_dir>/campaings_results/<experiment>/wilcoxon_analysis/`.
+For the older batch discussed in this project, the same launch works with
+`batch_dir:=/home/ubuntu-user/suave/results/batches/all_experiments_20260904_093305`.
+If necessary, add `config_dir:=/path/to/original/campaign/configs`; do not
+substitute configs from a different campaign.
+
+Q-Q plots and LaTeX tables remain available through the batch scripts:
+
+```bash
+python3 src/suave/suave_runner/suave_runner/analysis/qq_plot_batch.py /path/to/batch
+python3 src/suave/suave_runner/suave_runner/latex/wilcoxon_latex_tables_batch.py /path/to/batch
+```
+
+Q-Q plots use `campaings_results/<experiment>/q-q-plots/`. Tables read the
+existing Wilcoxon analysis and use
+`campaigns_latex_tables/wilcoxon_analysis/`, with Holm-adjusted p-values by
+default when the analysis used Holm correction. The standalone analysis
+command is still available in `suave_runner/suave_runner/analysis/`.
+
+See [suave_runner's guide](../suave/suave_runner/README.md) for details.
 
 ## OWL to PDDL
 

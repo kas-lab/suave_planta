@@ -10,15 +10,16 @@ def generate_launch_description():
     config_path = os.path.join(
         get_package_share_directory('suave_planta'),
         'config',
-        'extended_exp2_analysis_config.yml'
+        'runner',
+        'exp3_runner_config.yml'
     )
 
     # Launch the suave_runner node with the parameters loaded from YAML
     return LaunchDescription([
         Node(
             package='suave_runner',
-            executable='statistical_analysis',
-            name='analysis',
+            executable='suave_runner',
+            name='suave_runner_node',
             output='screen',
             parameters=[config_path],
         )

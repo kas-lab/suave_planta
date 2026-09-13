@@ -36,3 +36,5 @@ suave_problem_extended_created.pddl
 *.exe
 *.out
 *.app
+results/
+__pycache__/

@@ -49,6 +49,19 @@
           )
         )
       )
+      (not
+        (and
+          (not (= ?fd_goal fd_unground))
+          (exists (?f2)
+            (and
+              (not (= ?f ?f2))
+              (MotionMutexFunction ?f)
+              (MotionMutexFunction ?f2)
+              (inferred-F_active ?f2 true_boolean)
+            )
+          )
+        )
+      )
     )
     :effect (and
       (functionGrounding ?f ?fd_goal)
@@ -67,6 +80,20 @@
       (inferred-SolvesF ?fd_goal ?f)
       (FunctionDesign ?fd_goal)
       (not (inferred-Fd_realisability ?fd_goal false_boolean))
+
+      (not
+        (and
+          (not (= ?fd_goal fd_unground))
+          (exists (?f2)
+            (and
+              (not (= ?f ?f2))
+              (MotionMutexFunction ?f)
+              (MotionMutexFunction ?f2)
+              (inferred-F_active ?f2 true_boolean)
+            )
+          )
+        )
+      )
     )
     :effect (and
       (not (functionGrounding ?f ?fd_initial))

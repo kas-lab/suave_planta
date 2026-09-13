@@ -118,14 +118,17 @@
 
     <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#f_follow_pipeline">
         <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+        <!-- marks functions that send mutually-exclusive setpoints to mavros; see reconfigure1/reconfigure2 in suave_domain_extended.pddl -->
+        <rdf:type rdf:resource="http://www.metacontrol.org/suave#MotionMutexFunction"/>
     </owl:NamedIndividual>
-    
+
 
 
     <!-- http://www.metacontrol.org/suave#f_generate_search_path -->
 
     <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#f_generate_search_path">
         <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+        <rdf:type rdf:resource="http://www.metacontrol.org/suave#MotionMutexFunction"/>
     </owl:NamedIndividual>
     
 
@@ -220,6 +223,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.metacontrol.org/suave#generate_recharge_path">
         <rdf:type rdf:resource="http://www.metacontrol.org/tomasys#Function"/>
+        <rdf:type rdf:resource="http://www.metacontrol.org/suave#MotionMutexFunction"/>
     </owl:NamedIndividual>
     
 

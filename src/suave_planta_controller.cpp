@@ -18,6 +18,7 @@
 #include <future>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 
 #include "std_msgs/msg/float32.hpp"
 #include "std_srvs/srv/empty.hpp"
@@ -215,8 +216,16 @@ void SuavePlansysController::apply_diagnostics(
     new_predicates.push_back(qa_predicates["battery_level"]);
   }
 
+  bool diagnostics_applied = true;
   if (!new_predicates.empty() || !remove_predicates.empty()) {
-    problem_expert_->updatePredicates(new_predicates, remove_predicates);
+    diagnostics_applied = problem_expert_->updatePredicates(new_predicates, remove_predicates);
+  }
+  if (!initial_water_visibility_applied_ && qa_predicates.count("water_visibility")) {
+    if (!diagnostics_applied) {
+      throw std::runtime_error("Failed to apply initial water visibility to the planning problem");
+    }
+    initial_water_visibility_applied_ = true;
+    RCLCPP_INFO(get_logger(), "Initial water visibility applied to the planning problem");
   }
 }
 
@@ -270,6 +279,12 @@ bool SuavePlansysController::has_failed() const
 
 bool SuavePlansysController::execute_plan()
 {
+  if (!initial_water_visibility_applied_) {
+    RCLCPP_INFO_THROTTLE(
+      get_logger(), *get_clock(), 5000,
+      "Waiting for initial water visibility before planning");
+    return false;
+  }
   // Compute the plan
   auto domain = domain_expert_->getDomain();
   auto problem = problem_expert_->getProblem();

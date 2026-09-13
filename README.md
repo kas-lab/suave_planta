@@ -58,6 +58,14 @@ docker run -it --rm --gpus all --runtime=nvidia --name suave_planta -e DISPLAY=$
 
 ## Run SUAVE with PLANTA
 
+Before requesting its first plan, PLANTA waits for PlanSys2 to become active and
+for the first water-visibility observation to be applied to the planning problem.
+The SUAVE monitor publishes the initial visibility during vehicle startup and
+holds the visibility schedule at time zero until GUIDED. This prevents planning
+with unknown visibility while preserving the timing of visibility changes.
+If applying the initial observation fails, the controller reports a failure
+instead of planning with missing visibility.
+
 ### Batch runner
 
 To run all six experiment campaigns (`exp1`-`exp3` and `extended_exp1`-`extended_exp3`) sequentially in one go, use the generic `run_batch` node from `suave_runner`, configured through [batch_campaigns.yml](config/runner/batch_campaigns.yml):

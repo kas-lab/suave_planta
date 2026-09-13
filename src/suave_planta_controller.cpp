@@ -367,7 +367,10 @@ void SuavePlansysController::step()
       finish_controlling();
     } else {
       RCLCPP_INFO(get_logger(), "Replanning!");
-      execute_plan();
+      // Preserve the retry state when replacement planning or execution
+      // cannot be started; otherwise the controller can wait forever for a
+      // result that will never arrive.
+      first_iteration_ = !execute_plan();
       return;
     }
   }

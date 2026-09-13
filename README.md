@@ -153,7 +153,7 @@ ros2 run suave_runner suave_runner \
   -p experiment_logging:=True \
   -p experiments:='[
     "{\"experiment_launch\": \"ros2 launch suave_planta suave_planta.launch.py\", \
-      \"num_runs\": 1, \
+      \"num_runs\": 3, \
       \"adaptation_manager\": \"planta\", \
       \"mission_name\": \"suave\"}"
   ]'

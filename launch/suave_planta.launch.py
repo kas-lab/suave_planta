@@ -19,12 +19,11 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
 from launch.actions import OpaqueFunction
+from launch.actions import RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
-from launch.actions import RegisterEventHandler
-from launch.event_handlers import OnProcessExit
 
 
 def generate_launch_description():
@@ -32,12 +31,15 @@ def generate_launch_description():
     silent_arg = DeclareLaunchArgument(
         'silent',
         default_value='false',
-        description='Suppress all output (launch logs + node logs)'
+        description='Suppress console output while retaining file logs'
     )
+
     def configure_logging(context, *args, **kwargs):
         if silent.perform(context) == 'true':
             import logging
-            logging.getLogger().setLevel(logging.CRITICAL)
+            import launch.logging
+            launch.logging.launch_config.get_screen_handler().setLevel(
+                logging.CRITICAL)
         return []
 
     result_path = LaunchConfiguration('result_path')
@@ -144,8 +146,8 @@ def generate_launch_description():
     suave_planta_controller_node = Node(
         package='suave_planta',
         executable='suave_planta_controller',
-        name="mission_node",
         parameters=[mission_config],
+        output='own_log',
     )
 
     start_robot_pddl_action_node = Node(
@@ -175,7 +177,7 @@ def generate_launch_description():
         name='reconfigure_pddl_action_node',
         parameters=[{'action_name': 'reconfigure1'}]
     )
-    
+
     reconfigure2_pddl_action_node = Node(
         package='suave_planta',
         executable='action_reconfigure',

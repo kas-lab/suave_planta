@@ -29,12 +29,15 @@ def generate_launch_description():
     silent_arg = DeclareLaunchArgument(
         'silent',
         default_value='false',
-        description='Suppress all output (launch logs + node logs)'
+        description='Suppress console output while retaining file logs'
     )
+
     def configure_logging(context, *args, **kwargs):
         if silent.perform(context) == 'true':
             import logging
-            logging.getLogger().setLevel(logging.CRITICAL)
+            import launch.logging
+            launch.logging.launch_config.get_screen_handler().setLevel(
+                logging.CRITICAL)
         return []
 
     result_filename = LaunchConfiguration('result_filename')

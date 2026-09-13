@@ -15,9 +15,20 @@
 #define SUAVE_PLANTA__SUAVE_PLANTA_CONTROLLER_HPP_
 
 #include <algorithm>
+#include <atomic>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <string>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 #include "rclcpp/rclcpp.hpp"
 #include "diagnostic_msgs/msg/diagnostic_array.hpp"
+#include "lifecycle_msgs/srv/get_state.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "mavros_msgs/msg/state.hpp"
 #include "plansys2_domain_expert/DomainExpertClient.hpp"
@@ -33,11 +44,13 @@ namespace suave_planta
 class SuavePlansysController : public rclcpp::Node
 {
 public:
-  SuavePlansysController(const std::string & node_name);
+  explicit SuavePlansysController(const std::string & node_name);
 
   virtual ~SuavePlansysController();
 
   void init();
+
+  bool has_failed() const;
 
 protected:
   rclcpp::CallbackGroup::SharedPtr step_timer_cb_group_;
@@ -59,23 +72,58 @@ protected:
   rclcpp::Subscription<mavros_msgs::msg::State>::SharedPtr mavros_state_sub_;
   rclcpp::CallbackGroup::SharedPtr mavros_state_sub_cb_group_;
 
-  bool battery_charged_= true;
+  bool battery_charged_ = true;
   rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagnostics_sub_;
   rclcpp::CallbackGroup::SharedPtr diagnostics_sub_cb_group_;
 
-  void diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray &msg);
+  void diagnostics_cb(const diagnostic_msgs::msg::DiagnosticArray & msg);
+  void apply_diagnostics(const diagnostic_msgs::msg::DiagnosticArray & msg);
+  diagnostic_msgs::msg::DiagnosticArray take_pending_diagnostics();
 
   std::unordered_set<std::string> numbers_added_;
-  std::vector<plansys2::Predicate> add_symbolic_number(const std::string& number);
+  std::vector<plansys2::Predicate> add_symbolic_number(const std::string & number);
 
-  rclcpp::CallbackGroup::SharedPtr time_limit_timer_cb_group_;
-  rclcpp::TimerBase::SharedPtr time_limit_timer_;
-  
+  using LifecycleGetState = lifecycle_msgs::srv::GetState;
+  using DiagnosticKey = std::pair<std::string, std::string>;
+
+  std::mutex input_mutex_;
+  std::map<DiagnosticKey, std::string> pending_diagnostic_values_;
+  std::optional<rclcpp::Time> pending_guided_start_;
+  std::atomic_bool guided_start_received_{false};
+
+  rclcpp::CallbackGroup::SharedPtr lifecycle_cb_group_;
+  std::vector<rclcpp::Client<LifecycleGetState>::SharedPtr>
+  lifecycle_state_clients_;
+  std::mutex readiness_mutex_;
+  bool readiness_request_in_flight_ = false;
+  std::size_t readiness_responses_ = 0;
+  bool readiness_all_active_ = false;
+  std::uint64_t readiness_generation_ = 0;
+  std::atomic_bool plansys_ready_{false};
+  rclcpp::Time readiness_request_started_;
+  rclcpp::Time next_readiness_check_;
+  rclcpp::Time controller_start_time_;
+  double plansys_startup_timeout_ = 30.0;
+
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr failure_pub_;
+  std::atomic_bool controller_failed_{false};
+
   void step();
+  void step_guarded() noexcept;
+  void diagnostics_cb_guarded(
+    const diagnostic_msgs::msg::DiagnosticArray & msg) noexcept;
+  void mavros_state_cb_guarded(const mavros_msgs::msg::State & msg) noexcept;
+  bool plansys_is_ready();
+  void request_plansys_readiness();
+  void lifecycle_state_cb(
+    std::uint64_t generation,
+    rclcpp::Client<LifecycleGetState>::SharedFuture future) noexcept;
+  void report_controller_failure(
+    const std::string & callback, const std::string & reason) noexcept;
   void finish_controlling();
-  void time_limit_cb();
+  bool time_limit_reached();
   bool request_save_mission_results();
-  void mavros_state_cb(const mavros_msgs::msg::State &msg);
+  void mavros_state_cb(const mavros_msgs::msg::State & msg);
 };
 
 }  // namespace suave_planta

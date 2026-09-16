@@ -144,15 +144,34 @@ SuavePlansysController::take_pending_diagnostics()
 void SuavePlansysController::apply_diagnostics(
   const diagnostic_msgs::msg::DiagnosticArray & msg)
 {
+  if (!battery_tracking_checked_) {
+    battery_tracking_checked_ = true;
+    for (const auto & predicate : problem_expert_->getPredicates()) {
+      if (predicate.name == "qa_has_value" && !predicate.parameters.empty() &&
+        predicate.parameters[0].name == "obs_battery_level")
+      {
+        battery_tracking_supported_ = true;
+        break;
+      }
+    }
+  }
+
   std::vector<plansys2::Predicate> new_predicates;
   std::vector<plansys2::Predicate> remove_predicates;
   std::map<std::string, plansys2::Predicate> qa_predicates;
   for (const auto & status : msg.status) {
     if (status.message == "Component status") {
       for (const auto & value : status.values) {
+        // The domain file spells this constant "ERROR_string", but the PDDL
+        // parser lowercases identifiers while reading domain/problem files
+        // (see plansys2_pddl_parser's Stringreader) whereas the client-side
+        // parser::pddl::fromStringPredicate() used here does not -- it keeps
+        // whatever case we write. isValidPredicate() compares this argument
+        // against the parser's already-lowercased constant table with a
+        // case-sensitive ==, so this literal must stay lowercase to match.
         std::string pred_str = "(c_status " + value.key + " error_string)";
         auto predicate = parser::pddl::fromStringPredicate(pred_str);
-        if (value.value == "OK") {
+        if (value.value == "OK" || value.value == "RECOVERED") {
           if (problem_expert_->existPredicate(predicate)) {
             remove_predicates.push_back(predicate);
           }
@@ -163,6 +182,9 @@ void SuavePlansysController::apply_diagnostics(
     }
     if (status.message == "QA status") {
       for (const auto & value : status.values) {
+        if (value.key == "battery_level" && !battery_tracking_supported_) {
+          continue;
+        }
         std::ostringstream oss;
         oss << std::fixed << std::setprecision(2) << std::stod(value.value);
         std::string value_two_decimals = oss.str();

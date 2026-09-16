@@ -74,6 +74,8 @@ protected:
 
   bool battery_charged_ = true;
   bool initial_water_visibility_applied_ = false;
+  bool battery_tracking_checked_ = false;
+  bool battery_tracking_supported_ = false;
   rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diagnostics_sub_;
   rclcpp::CallbackGroup::SharedPtr diagnostics_sub_cb_group_;
 
